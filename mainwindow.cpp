@@ -1087,7 +1087,7 @@ double MainWindow::calc_size()
 {
     int hi = 0, low = 0;
     unsigned int xa, xb, ya, yb, xc, yc, xd, yd;
-    double  a1 = 0, a2 = 0;
+    double  a1 = 0;
     double left_angle, right_angle, sum_angle = 0;
     //double xy_ratio = 3.3;
     double left_size, right_size;
@@ -1111,36 +1111,14 @@ double MainWindow::calc_size()
     else
         a1 = 0;
 
-    if( (yd - yc) != 0)
-        a2 = atan(((double) xd - (double) xc) / ((double) yd - (double) yc));
-    else
-        a2 = 0;
-
     if ( abs(a1*(180/M_PI)) > 25) a1 = 0; //detection problem
-    if ( abs(a2*(180/M_PI)) > 25) a2 = 0; //detection problem
 
-    if(a1<=0 && a2>=0)
-    {
-        sum_angle = a1 + a2;
-    }else if(a1>=0 && a2<=0) //Should not happend
-    {
-        sum_angle = 0;
-    }else if(a1<=0 && a2<=0)
-    {
-        sum_angle = a1 - a2;
-    }else if(a1>=0 && a2>=0)
-    {
-        sum_angle = a1 - a2;
-    }
-
-    left_angle = sum_angle / 2.0;
+    left_angle =  a1 / 2.0;
     left_size = ( (hi - low) / cos( left_angle)) + offset_heel + offset_toe;
 
-    qDebug() << "a1" << a1*(180/M_PI) << "a2" << a2*(180/M_PI);
     qDebug() << "left_angle" << left_angle*(180/M_PI);
     qDebug() << "left_size" << left_size;
 
-    dataDisplay.append("A1 = " + QString::number(a1*(180/M_PI)) + " A2 = " + QString::number(a2*(180/M_PI)) + "\n");
     dataDisplay.append("LEFT ANGLE = " + QString::number(left_angle*(180/M_PI)) + "\n");
     dataDisplay.append("LEFT SIZE = " + QString::number(left_size) + "\n");
 
@@ -1161,36 +1139,14 @@ double MainWindow::calc_size()
     else
         a1 = 0;
 
-    if( (yd - yc) != 0)
-        a2 = atan(((double) xd - (double) xc) / ((double) yd - (double) yc));
-    else
-        a2 = 0;
-
     if ( abs(a1*(180/M_PI)) > 25) a1 = 0; //detection problem
-    if ( abs(a2*(180/M_PI)) > 25) a2 = 0; //detection problem
 
-    if(a1<=0 && a2>=0)
-    {
-        sum_angle = a2 + a1;
-    }else if(a1>=0 && a2<=0) //Should not happen
-    {
-        sum_angle = 0;
-    }else if(a1<=0 && a2<=0)
-    {
-        sum_angle = a2 - a1;
-    }else if(a1>=0 && a2>=0)
-    {
-        sum_angle = a2 - a1;
-    }
-
-    right_angle = sum_angle / 2.0;
+    right_angle = a1;
     right_size = ( (hi - low) / cos( right_angle)) + offset_heel + offset_toe;
 
-    qDebug() << "a1" << a1*(180/M_PI) << "a2" << a2*(180/M_PI);
     qDebug() << "right_angle" << right_angle*(180/M_PI);
     qDebug() << "right_size" << right_size;
 
-    dataDisplay.append("A1 = " + QString::number(a1*(180/M_PI)) + " A2 = " + QString::number(a2*(180/M_PI)) + "\n" );
     dataDisplay.append("RIGHT ANGLE = " + QString::number(right_angle*(180/M_PI)) +"\n");
     dataDisplay.append("RIGHT SIZE = " + QString::number(right_size) +"\n");
 

@@ -20,7 +20,7 @@ public:
     Overlay() : QwtPlotZoneItem()
     {
        QLine line(0,0,0,0);
-       for(int i=0; i<2; i++)
+       for(int i=0; i<1; i++)
        {
            m_lines.append(line);
        }
@@ -30,7 +30,7 @@ public:
 
     void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect) const
     {
-        for(int i=0; i<2; i++)
+        for(int i=0; i<m_lines.size(); i++)
         {
             painter->setPen(QPen(Qt::black, 8, Qt::DashDotLine, Qt::RoundCap));
             painter->drawLine(m_lines.at(i).x1(), m_lines.at(i).y1(), m_lines.at(i).x2(), m_lines.at(i).y2());
@@ -44,7 +44,8 @@ private:
 
 void Overlay::set_coordonnees(QVector <QLine> lines)
 {
-    for(int i=0; i<2; i++)
+    qDebug() << lines;
+    for(int i=0; i<lines.size(); i++)
     {
         m_lines.replace(i, lines.at(i) );
     }

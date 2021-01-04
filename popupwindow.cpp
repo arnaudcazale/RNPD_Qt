@@ -9,6 +9,8 @@
 #include <qlabel.h>
 #include <qcheckbox.h>
 #include <qspinbox.h>
+#include <QtDebug>
+
 
 PopupWindow::PopupWindow(QWidget *parent) :
     QMainWindow(parent)
