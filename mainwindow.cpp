@@ -687,11 +687,11 @@ void MainWindow::get_coor_extr_left_for_left_foot(QVector <QVector <double> > *m
 void MainWindow::get_extr_axial_left(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb )
 {
     QVector <double> *tab = new QVector <double> ();
-    unsigned int median_line = get_median_line(matrix_bin); //Median_line corresponding to the line number of thumb low position
+    //unsigned int median_line = get_median_line(matrix_bin); //Median_line corresponding to the line number of thumb low position
     //qDebug() << "median_line" << median_line;
 
     // make sum tab for each lines*/
-    for( int i = 0; i < LGN_NBR; i++)
+    /*for( int i = 0; i < LGN_NBR; i++)
     {
         tab->append(0);
         for(int j = 0; j < COL_NBR; j++)
@@ -702,15 +702,28 @@ void MainWindow::get_extr_axial_left(QVector <QVector <double> > *matrix_bin, un
                 break;
             }
         }
+    }*/
+
+    // make sum tab for each lines
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        tab->append(0);
+        for(int j = ( COL_NBR - 1 ); j >= 0; j--)
+        {
+            tab->replace(i, ( COL_NBR - 1 ) - j);
+            if(matrix_bin->at(i).at(j) == 1)
+            {
+                break;
+            }
+        }
     }
 
     qDebug() << *tab;
 
     // bottom half -> xa, ya
     *xa = COL_NBR - 1  ;
-    *ya = median_line;
-
-    for( int i = 0; i < median_line; i++)
+    *ya = 0;
+    for( int i = 0; i < LGN_NBR; i++)
     {
         if( tab->at(i) < *xa)
         {
@@ -720,18 +733,13 @@ void MainWindow::get_extr_axial_left(QVector <QVector <double> > *matrix_bin, un
         }
     }
 
-    //check upper line
-    /**xa = COL_NBR - 1;
-    for( int i = *ya+1; i < median_line; i++)
-    {
-        if( (tab->at(i) < *xa) )
-        {
-            *xa = tab->at(i);
-            *ya = i;
-        }
-    }*/
+    //*xa = (COL_NBR - 1) - *xa;
+
+    //Check upper line
     *xa = tab->at(*ya+1);
     *ya = *ya+1;
+
+    *xa = (COL_NBR - 1) - *xa;
 
     qDebug() << "xa = " << *xa << "ya = " << *ya;
     dataDisplay.append("LEFT FOR LEFT FOOT \n");
@@ -739,26 +747,22 @@ void MainWindow::get_extr_axial_left(QVector <QVector <double> > *matrix_bin, un
 
     // top half -> xb, yb
     *xb = COL_NBR - 1 ;
-    *yb = LGN_NBR;
-    for( int i = *ya; i < LGN_NBR; i++)
+    *yb = LGN_NBR - 1;
+    for( int i = LGN_NBR - 1; i >= 0; i--)
     {
-        if( (tab->at(i) < *xb) )
+        if( (tab->at(i) < *xb) || (tab->at(i) == 0))    //Find upper position or if too much angle, thumb can be outside pad
         {
             *xb = tab->at(i);
             *yb = i;
+            break;
         }
     }
 
-    //check upper line
-    /**xb = 0 ;
-    for( int i = *yb+1; i < *ya; i++)
-    {
-        if( (tab->at(i) > *xb) && (tab->at(i) < 15) )
-        {
-            *xb = tab->at(i);
-            *yb = i;
-        }
-    }*/
+
+    //Check down line
+    *xb = tab->at(*yb-1);
+    *yb = *yb-1;
+    *xb = (COL_NBR - 1) - *xb;
 
     qDebug() << "xb = " << *xb << "yb = " << *yb;
     dataDisplay.append("xb = " + QString::number(*xb) + " yb = " + QString::number(*yb) + "\n");
@@ -992,17 +996,17 @@ void MainWindow::get_coor_extr_right_for_right_foot(QVector <QVector <double> > 
 void MainWindow::get_extr_axial_right(QVector <QVector <double> > *matrix_bin, unsigned int *xc, unsigned int *yc, unsigned int *xd, unsigned int *yd )
 {
     QVector <double> *tab = new QVector <double> ();
-    unsigned int median_line = get_median_line(matrix_bin); //Median_line corresponding to the line number of thumb low position
+    //unsigned int median_line = get_median_line(matrix_bin); //Median_line corresponding to the line number of thumb low position
     //qDebug() << "median_line" << median_line;
 
-    // make sum tab for each lines
+    // make sum tab for each lines*/
     for( int i = 0; i < LGN_NBR; i++)
     {
         tab->append(0);
-        for(int j = ( COL_NBR - 1 ); j >= 0; j--)
+        for(int j = 0; j < COL_NBR; j++)
         {
-            tab->replace(i, ( COL_NBR - 1 ) - j);
-            if(matrix_bin->at(i).at(j) == 1)
+            tab->replace(i, j);
+            if (matrix_bin->at(i).at(j) == 1)
             {
                 break;
             }
@@ -1013,48 +1017,43 @@ void MainWindow::get_extr_axial_right(QVector <QVector <double> > *matrix_bin, u
 
     // bottom half -> xc, yc
     *xc = COL_NBR - 1 ;
-    *yc = median_line;
+    *yc = 0;
 
-    for( int i = median_line; i > 0; i--)
+    for( int i = 0; i < LGN_NBR; i++)
     {
-        if( tab->at(i) < *xc)
+        if( tab->at(i) < *xc)  //Find first pixel
         {
             *xc = tab->at(i);
             *yc = i;
+            break;
         }
     }
 
-    *xc = (COL_NBR - 1) - *xc;
+    //Check upper line
+    *xc = tab->at(*yc+1);
+    *yc = *yc+1;
 
     qDebug() << "xc = " << *xc << "yc = " << *yc;
     dataDisplay.append("RIGHT FOR RIGHT FOOT\n");
     dataDisplay.append("xc = " + QString::number(*xc) + " yc = " + QString::number(*yc) + "\n");
 
     // top half -> xb, yb
-    *xd = 0 ;
-    *yd = *yc;
+    *xd = COL_NBR - 1 ;
+    *yd = LGN_NBR - 1;
 
-    for( int i = 0; i < *yc; i++)
+    for( int i = LGN_NBR - 1; i >= 0; i--)
     {
-        if( (tab->at(i) > *xd) && (tab->at(i) < 15))
+        if( (tab->at(i) < *xd) ) //Find upper position or if too much angle, thumb can be outside pad
         {
             *xd = tab->at(i);
             *yd = i;
+            break;
         }
     }
 
-    //Check upperlign
-    *xd = 0 ;
-    for( int i = *yd+1; i < *yc; i++)
-    {
-        if( (tab->at(i) > *xd) && (tab->at(i) < 15))
-        {
-            *xd = tab->at(i);
-            *yd = i;
-        }
-    }
-
-    *xd = ( COL_NBR - 1 ) - *xd;
+    //Check down line
+    *xd = tab->at(*yd-1);
+    *yd = *yd-1;
 
     qDebug() << "xd = " << *xd << "yd = " << *yd;
     dataDisplay.append("xd = " + QString::number(*xd) + " yd = " + QString::number(*yd) + "\n");
@@ -1091,8 +1090,7 @@ double MainWindow::calc_size()
     double left_angle, right_angle, sum_angle = 0;
     //double xy_ratio = 3.3;
     double left_size, right_size;
-    double offset_heel = 1.5/0.66; //1.5cm convert to foot print for heel
-    double offset_toe = (1/0.66)+1; //On rajoute 1cm pour la définition de la pointure et une pointure et demi supérieurepour la taille de la chaussure réelle
+    double offset = 5;
 
     //LEFT FOOT
     binarize(&m_data_left, &m_data_bin_left);
@@ -1113,8 +1111,8 @@ double MainWindow::calc_size()
 
     if ( abs(a1*(180/M_PI)) > 25) a1 = 0; //detection problem
 
-    left_angle =  a1 / 2.0;
-    left_size = ( (hi - low) / cos( left_angle)) + offset_heel + offset_toe;
+    left_angle =  (M_PI/2) - a1;
+    left_size = ( (hi - low) / sin( left_angle)) + offset;
 
     qDebug() << "left_angle" << left_angle*(180/M_PI);
     qDebug() << "left_size" << left_size;
@@ -1126,7 +1124,7 @@ double MainWindow::calc_size()
     binarize(&m_data_right, &m_data_bin_right);
     //get_coor_extr_left_for_right_foot(&m_data_bin_right, &xa, &ya, &xb, &yb);
     //get_coor_extr_right_for_right_foot(&m_data_bin_right, &xc, &yc, &xd, &yd);
-    get_extr_axial_right(&m_data_bin_left, &xa, &ya, &xb, &yb);
+    get_extr_axial_right(&m_data_bin_right, &xa, &ya, &xb, &yb);
     get_hilo_pos(&m_data_right, &hi, &low);
 
     /*xa *= xy_ratio;
@@ -1141,8 +1139,8 @@ double MainWindow::calc_size()
 
     if ( abs(a1*(180/M_PI)) > 25) a1 = 0; //detection problem
 
-    right_angle = a1;
-    right_size = ( (hi - low) / cos( right_angle)) + offset_heel + offset_toe;
+    right_angle = (M_PI/2)-a1;
+    right_size = ( (hi - low) / sin(right_angle)) + offset;
 
     qDebug() << "right_angle" << right_angle*(180/M_PI);
     qDebug() << "right_size" << right_size;
