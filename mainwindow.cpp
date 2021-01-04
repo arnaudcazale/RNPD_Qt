@@ -496,9 +496,9 @@ void MainWindow::binarize(QVector <QVector <double> > *matrix, QVector <QVector 
     matrix_bin->clear();
 
     // calculate means of both matrixes
-    //unsigned int mean_left = calc_mean(&m_data_left);
-    //unsigned int mean_right = calc_mean(&m_data_right);
-    //unsigned int mean = (mean_left + mean_right)/2;
+    unsigned int mean_left = calc_mean(&m_data_left);
+    unsigned int mean_right = calc_mean(&m_data_right);
+    unsigned int mean = (mean_left + mean_right)/2;
 
     //qDebug() << mean;
 
@@ -602,6 +602,89 @@ unsigned int MainWindow::get_median_line(QVector <QVector <double> > *matrix_bin
 }
 
 void MainWindow::get_coor_extr_left_for_left_foot(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb )
+{
+    QVector <double> *tab = new QVector <double> ();
+    unsigned int median_line = get_median_line(matrix_bin); //Median_line corresponding to the line number of thumb low position
+    //qDebug() << "median_line" << median_line;
+
+    // make sum tab for each lines*/
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        tab->append(0);
+        for(int j = 0; j < COL_NBR; j++)
+        {
+            tab->replace(i, j);
+            if (matrix_bin->at(i).at(j) == 1)
+            {
+                break;
+            }
+        }
+    }
+
+    qDebug() << *tab;
+
+    // bottom half -> xa, ya
+    *xa = COL_NBR - 1  ;
+    *ya = median_line;
+
+    for( int i = 0; i < median_line; i++)
+    {
+        if( tab->at(i) < *xa)
+        {
+            *xa = tab->at(i);
+            *ya = i;
+            break; //Find first bottom pixel found is OK
+        }
+    }
+
+    //check upper line
+    /**xa = COL_NBR - 1;
+    for( int i = *ya+1; i < median_line; i++)
+    {
+        if( (tab->at(i) < *xa) )
+        {
+            *xa = tab->at(i);
+            *ya = i;
+        }
+    }*/
+    *xa = tab->at(*ya+1);
+    *ya = *ya+1;
+
+    qDebug() << "xa = " << *xa << "ya = " << *ya;
+    dataDisplay.append("LEFT FOR LEFT FOOT \n");
+    dataDisplay.append("xa = " + QString::number(*xa) + " ya = " + QString::number(*ya) + "\n");
+
+    // top half -> xb, yb
+    *xb = COL_NBR - 1 ;
+    *yb = LGN_NBR;
+    for( int i = *ya; i < LGN_NBR; i++)
+    {
+        if( (tab->at(i) < *xb) )
+        {
+            *xb = tab->at(i);
+            *yb = i;
+        }
+    }
+
+    //check upper line
+    /**xb = 0 ;
+    for( int i = *yb+1; i < *ya; i++)
+    {
+        if( (tab->at(i) > *xb) && (tab->at(i) < 15) )
+        {
+            *xb = tab->at(i);
+            *yb = i;
+        }
+    }*/
+
+    qDebug() << "xb = " << *xb << "yb = " << *yb;
+    dataDisplay.append("xb = " + QString::number(*xb) + " yb = " + QString::number(*yb) + "\n");
+
+    QLine line(*xa, *ya, *xb, *yb);
+    m_lines.append(line);
+}
+
+void MainWindow::get_extr_axial_left(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb )
 {
     QVector <double> *tab = new QVector <double> ();
     unsigned int median_line = get_median_line(matrix_bin); //Median_line corresponding to the line number of thumb low position
@@ -906,6 +989,83 @@ void MainWindow::get_coor_extr_right_for_right_foot(QVector <QVector <double> > 
     m_lines.append(line);
 }
 
+void MainWindow::get_extr_axial_right(QVector <QVector <double> > *matrix_bin, unsigned int *xc, unsigned int *yc, unsigned int *xd, unsigned int *yd )
+{
+    QVector <double> *tab = new QVector <double> ();
+    unsigned int median_line = get_median_line(matrix_bin); //Median_line corresponding to the line number of thumb low position
+    //qDebug() << "median_line" << median_line;
+
+    // make sum tab for each lines
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        tab->append(0);
+        for(int j = ( COL_NBR - 1 ); j >= 0; j--)
+        {
+            tab->replace(i, ( COL_NBR - 1 ) - j);
+            if(matrix_bin->at(i).at(j) == 1)
+            {
+                break;
+            }
+        }
+    }
+
+    //qDebug() << *tab;
+
+    // bottom half -> xc, yc
+    *xc = COL_NBR - 1 ;
+    *yc = median_line;
+
+    for( int i = median_line; i > 0; i--)
+    {
+        if( tab->at(i) < *xc)
+        {
+            *xc = tab->at(i);
+            *yc = i;
+        }
+    }
+
+    *xc = (COL_NBR - 1) - *xc;
+
+    qDebug() << "xc = " << *xc << "yc = " << *yc;
+    dataDisplay.append("RIGHT FOR RIGHT FOOT\n");
+    dataDisplay.append("xc = " + QString::number(*xc) + " yc = " + QString::number(*yc) + "\n");
+
+    // top half -> xb, yb
+    *xd = 0 ;
+    *yd = *yc;
+
+    for( int i = 0; i < *yc; i++)
+    {
+        if( (tab->at(i) > *xd) && (tab->at(i) < 15))
+        {
+            *xd = tab->at(i);
+            *yd = i;
+        }
+    }
+
+    //Check upperlign
+    *xd = 0 ;
+    for( int i = *yd+1; i < *yc; i++)
+    {
+        if( (tab->at(i) > *xd) && (tab->at(i) < 15))
+        {
+            *xd = tab->at(i);
+            *yd = i;
+        }
+    }
+
+    *xd = ( COL_NBR - 1 ) - *xd;
+
+    qDebug() << "xd = " << *xd << "yd = " << *yd;
+    dataDisplay.append("xd = " + QString::number(*xd) + " yd = " + QString::number(*yd) + "\n");
+
+
+    QLine line(*xc, *yc, *xd, *yd);
+    m_lines.append(line);
+}
+
+
+
 unsigned int MainWindow::calc_mean(QVector <QVector <double> > *matrix)
 {
     double mean = 0.0;
@@ -936,8 +1096,9 @@ double MainWindow::calc_size()
 
     //LEFT FOOT
     binarize(&m_data_left, &m_data_bin_left);
-    get_coor_extr_left_for_left_foot(&m_data_bin_left, &xa, &ya, &xb, &yb);
-    get_coor_extr_right_for_left_foot(&m_data_bin_left, &xc, &yc, &xd, &yd);
+    //get_coor_extr_left_for_left_foot(&m_data_bin_left, &xa, &ya, &xb, &yb);
+    //get_coor_extr_right_for_left_foot(&m_data_bin_left, &xc, &yc, &xd, &yd);
+    get_extr_axial_left(&m_data_bin_left, &xa, &ya, &xb, &yb);
     get_hilo_pos(&m_data_left, &hi, &low);
 
     /*xa *= xy_ratio;
@@ -985,8 +1146,9 @@ double MainWindow::calc_size()
 
     //RIGHT FOOT
     binarize(&m_data_right, &m_data_bin_right);
-    get_coor_extr_left_for_right_foot(&m_data_bin_right, &xa, &ya, &xb, &yb);
-    get_coor_extr_right_for_right_foot(&m_data_bin_right, &xc, &yc, &xd, &yd);
+    //get_coor_extr_left_for_right_foot(&m_data_bin_right, &xa, &ya, &xb, &yb);
+    //get_coor_extr_right_for_right_foot(&m_data_bin_right, &xc, &yc, &xd, &yd);
+    get_extr_axial_right(&m_data_bin_left, &xa, &ya, &xb, &yb);
     get_hilo_pos(&m_data_right, &hi, &low);
 
     /*xa *= xy_ratio;
