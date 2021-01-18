@@ -214,6 +214,8 @@ void MainWindow::readData()
                  filling = false;
                  m_count++;
 
+                 qDebug() << *m_data;
+
                  //splitData();
                  splitDataFillZero();
                  fillLeftDataMeanNeightboorhood();
@@ -221,6 +223,7 @@ void MainWindow::readData()
                  emit dataReady_left(&m_data_left);
                  emit dataReady_right(&m_data_right);
 
+                 /*
                  //size computing
                  double size = calc_size();
                  m_pointure.append(size);
@@ -262,7 +265,7 @@ void MainWindow::readData()
                          dataDisplay_gravity.append("SUPINAL\n");
 
                  m_display_gravity->putData(dataDisplay_gravity);
-                 dataDisplay_gravity.clear();
+                 dataDisplay_gravity.clear();*/
              }
          }else
          {
