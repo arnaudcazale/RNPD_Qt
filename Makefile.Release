@@ -1533,7 +1533,8 @@ release/popupwindow.o: popupwindow.cpp popupwindow.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qrubberband.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtCore/qabstractitemmodel.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qcheckbox.h \
-		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qspinbox.h
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qspinbox.h \
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtCore/QtDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\popupwindow.o popupwindow.cpp
 
 release/settingsdialog.o: settingsdialog.cpp settingsdialog.h \

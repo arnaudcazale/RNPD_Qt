@@ -98,7 +98,7 @@ public:
     {
         setInterval( Qt::XAxis, QwtInterval( 0, COL_NBR) );
         setInterval( Qt::YAxis, QwtInterval( 0, LGN_NBR) );
-        setInterval( Qt::ZAxis, QwtInterval( 0.0, 1000 ) );
+        setInterval( Qt::ZAxis, QwtInterval( 0.0, 1000) );
 
         QVector <double> matrix;
 
@@ -110,6 +110,11 @@ public:
             }
         }
         setValueMatrix( matrix, COL_NBR );
+    }
+
+    void changeZScale(int max)
+    {
+        setInterval( Qt::ZAxis, QwtInterval( 0.0, max) );
     }
 
 private:
@@ -531,6 +536,7 @@ int Plot::getNoiseMargin(void)
 {
     return d_noise_margin;
 }
+
 
 
 

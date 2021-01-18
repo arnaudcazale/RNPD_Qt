@@ -75,6 +75,26 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    struct point_t{
+        int line;
+        int col;
+    };
+
+    struct line_zone_t{
+        int 	index;
+        int		start_line;
+        int 	end_line;
+        int		n_lines;
+    };
+
+    struct column_zone_t{
+        int 	index;
+        int		start_col;
+        int 	end_col;
+        int		n_col;
+    };
+
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -83,6 +103,8 @@ signals:
     void dataReady_left(QVector<QVector <double> > *);
     void dataReady_right(QVector <QVector <double> > *);
     void dataReady_line(QVector <QLine> );
+    void dataReadyGravity_left(QVector<QVector <double> > *);
+    void dataReadyGravity_right(QVector <QVector <double> > *);
 
 private slots:
     void openSerialPort();
@@ -100,10 +122,14 @@ private:
     void splitDataFillZero();
     void fillLeftDataMeanNeightboorhood();
     void fillRightDataMeanNeightboorhood();
-    void binarize(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin);
+    void binarizeFromNoiseMargin(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin);
+    void binarizeFromMean(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin);
     unsigned int get_median_line(QVector <QVector <double> > *matrix_bin);
     unsigned int calc_mean(QVector <QVector <double> > *matrix);
     double calc_size(void);
+    int calc_gravity(void);
+    int calc_pronation_left(QVector <QVector <double> > *matrix_filter);
+    int calc_pronation_right(QVector <QVector <double> > *matrix_filter);
     void get_hilo_pos(QVector <QVector <double> > *matrix, int *hi, int *low);
     void get_coor_extr_left_for_left_foot(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb);
     void get_coor_extr_right_for_left_foot(QVector <QVector <double> > *matrix_bin, unsigned int *xc, unsigned int *yc, unsigned int *xd, unsigned int *yd);
@@ -111,7 +137,12 @@ private:
     void get_coor_extr_right_for_right_foot(QVector <QVector <double> > *matrix_bin, unsigned int *xc, unsigned int *yc, unsigned int *xd, unsigned int *yd);
     void get_extr_axial_left(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb);
     void get_extr_axial_right(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb);
-
+    void filterMatrix(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin, QVector <QVector <double> > *matrix_filtered);
+    void gvtGet(QVector <QVector <double> > *matrix_filtered, point_t *A, point_t *B);
+    static int compare_n_lines(const void *a, const void *b);
+    static int compare_index(const void *a, const void *b);
+    static int compare_n_cols( const void *a, const void *b);
+    static long sumMatrix(QVector <QVector <double> > *matrix, int startLine, int endLine);
 
 private:
     void showStatusMessage(const QString &message);
@@ -121,16 +152,21 @@ private:
     Console *m_console = nullptr;
     SettingsDialog *m_settings = nullptr;
     PopupWindow *m_popupwindow = nullptr;
+    PopupWindow *m_popupwindowGravity = nullptr;
     DisplayWindow *m_display = nullptr;
     DisplayWindow *m_display_pointure = nullptr;
+    DisplayWindow *m_display_gravity = nullptr;
     QSerialPort *m_serial = nullptr;
     QVector<unsigned int> *m_data = nullptr;
     QVector <QVector <double> > m_data_left;
     QVector <QVector <double> > m_data_right;
     QVector <QVector <double> > m_data_bin_left;
     QVector <QVector <double> > m_data_bin_right;
+    QVector <QVector <double> > m_data_filter_left;
+    QVector <QVector <double> > m_data_filter_right;
     QString dataDisplay;
     QString dataDisplay_pointure;
+    QString dataDisplay_gravity;
     QVector <QLine> m_lines;
     QVector <double> m_pointure;
 

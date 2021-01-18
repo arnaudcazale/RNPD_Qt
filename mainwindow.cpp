@@ -71,8 +71,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_console(new Console),
     m_settings(new SettingsDialog),
     m_popupwindow(new PopupWindow),
+    m_popupwindowGravity(new PopupWindow),
     m_display(new DisplayWindow),
     m_display_pointure(new DisplayWindow),
+    m_display_gravity(new DisplayWindow),
 //! [1]
     m_serial(new QSerialPort(this)),
     m_data(new QVector<unsigned int>)
@@ -93,14 +95,20 @@ MainWindow::MainWindow(QWidget *parent) :
         m_data_right.append(foo);
         m_data_bin_left.append(foo);
         m_data_bin_right.append(foo);
+        m_data_filter_left.append(foo);
+        m_data_filter_right.append(foo);
+
     }
 
     m_ui->setupUi(this);
     m_console->setEnabled(false);
     m_popupwindow->setMinimumSize(767, 1024);
     m_popupwindow->show();
+    m_popupwindowGravity->setMinimumSize(767, 1024);
+    m_popupwindowGravity->show();
     m_display->show();
     m_display_pointure->show();
+    m_display_gravity->show();
     setCentralWidget(m_console);
 
     m_ui->actionConnect->setEnabled(true);
@@ -123,6 +131,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(dataReady_left(QVector<QVector <double> > *)), m_popupwindow, SLOT(dataUpdate_left(QVector<QVector <double> > *)));
     connect(this, SIGNAL(dataReady_right(QVector<QVector <double> > *)), m_popupwindow, SLOT(dataUpdate_right(QVector<QVector <double> > *)));
     connect(this, SIGNAL(dataReady_line(QVector <QLine>)), m_popupwindow, SLOT(drawLine(QVector <QLine>)));
+    connect(this, SIGNAL(dataReadyGravity_left(QVector<QVector <double> > *)), m_popupwindowGravity, SLOT(dataUpdate_left(QVector<QVector <double> > *)));
+    connect(this, SIGNAL(dataReadyGravity_right(QVector<QVector <double> > *)), m_popupwindowGravity, SLOT(dataUpdate_right(QVector<QVector <double> > *)));
 
 }
 //! [3]
@@ -208,9 +218,10 @@ void MainWindow::readData()
                  splitDataFillZero();
                  fillLeftDataMeanNeightboorhood();
                  fillRightDataMeanNeightboorhood();
-
                  emit dataReady_left(&m_data_left);
                  emit dataReady_right(&m_data_right);
+
+                 //size computing
                  double size = calc_size();
                  m_pointure.append(size);
 
@@ -229,6 +240,29 @@ void MainWindow::readData()
                  dataDisplay.clear();
                  dataDisplay_pointure.clear();
                  m_lines.clear();
+
+                 //Pronation computing
+                 int grav = calc_gravity();
+                 dataDisplay_gravity.append("GRAVITY = " + QString::number(grav) + "\n");
+
+                 emit dataReadyGravity_left(&m_data_filter_left);
+                 emit dataReadyGravity_right(&m_data_filter_right);
+
+                 int devLeft = calc_pronation_left(&m_data_filter_left);
+                 int devRight = calc_pronation_right(&m_data_filter_right);
+                 int dev = (devLeft + devRight) /2;
+
+                 qDebug() << "dev_total" << dev;
+
+                 if( dev == 0)
+                     dataDisplay_gravity.append("NEUTRE\n");
+                     else if( dev > 0)
+                         dataDisplay_gravity.append("CONTROL\n");
+                     else
+                         dataDisplay_gravity.append("SUPINAL\n");
+
+                 m_display_gravity->putData(dataDisplay_gravity);
+                 dataDisplay_gravity.clear();
              }
          }else
          {
@@ -491,7 +525,7 @@ void MainWindow::fillRightDataMeanNeightboorhood()
     }
 }
 
-void MainWindow::binarize(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin)
+void MainWindow::binarizeFromNoiseMargin(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin)
 {
     matrix_bin->clear();
 
@@ -519,6 +553,31 @@ void MainWindow::binarize(QVector <QVector <double> > *matrix, QVector <QVector 
 
         matrix_bin->append(foo);
         //qDebug() << matrix_bin->at(i);
+    }
+}
+
+void MainWindow::binarizeFromMean(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin)
+{
+    matrix_bin->clear();
+
+    // calculate means of both matrixes
+    unsigned int mean_left = calc_mean(&m_data_left);
+    unsigned int mean_right = calc_mean(&m_data_right);
+    unsigned int mean = (mean_left + mean_right)/2;
+
+    for(int i = 0; i < LGN_NBR ; i++)
+    {
+        QVector<double> foo;
+
+        for(int j = 0; j < COL_NBR; j++)
+        {
+            if( matrix->at(i).at(j) > mean)
+                foo.append(1);
+            else
+                foo.append(0);
+        }
+
+        matrix_bin->append(foo);
     }
 }
 
@@ -1063,8 +1122,6 @@ void MainWindow::get_extr_axial_right(QVector <QVector <double> > *matrix_bin, u
     m_lines.append(line);
 }
 
-
-
 unsigned int MainWindow::calc_mean(QVector <QVector <double> > *matrix)
 {
     double mean = 0.0;
@@ -1093,7 +1150,7 @@ double MainWindow::calc_size()
     double offset = 5;
 
     //LEFT FOOT
-    binarize(&m_data_left, &m_data_bin_left);
+    binarizeFromNoiseMargin(&m_data_left, &m_data_bin_left);
     //get_coor_extr_left_for_left_foot(&m_data_bin_left, &xa, &ya, &xb, &yb);
     //get_coor_extr_right_for_left_foot(&m_data_bin_left, &xc, &yc, &xd, &yd);
     get_extr_axial_left(&m_data_bin_left, &xa, &ya, &xb, &yb);
@@ -1121,7 +1178,7 @@ double MainWindow::calc_size()
     dataDisplay.append("LEFT SIZE = " + QString::number(left_size) + "\n");
 
     //RIGHT FOOT
-    binarize(&m_data_right, &m_data_bin_right);
+    binarizeFromNoiseMargin(&m_data_right, &m_data_bin_right);
     //get_coor_extr_left_for_right_foot(&m_data_bin_right, &xa, &ya, &xb, &yb);
     //get_coor_extr_right_for_right_foot(&m_data_bin_right, &xc, &yc, &xd, &yd);
     get_extr_axial_right(&m_data_bin_right, &xa, &ya, &xb, &yb);
@@ -1158,6 +1215,618 @@ double MainWindow::calc_size()
     //dataDisplay.append("POINTURE ARRONDIE = " + QString::number(pointure_arrondie) + "\n");
 
     return pointure;
+}
+
+int MainWindow::calc_gravity(void){
+
+    binarizeFromMean(&m_data_left, &m_data_bin_left);
+    binarizeFromMean(&m_data_right, &m_data_bin_right);
+    filterMatrix(&m_data_left, &m_data_bin_left, &m_data_filter_left);
+    filterMatrix(&m_data_right, &m_data_bin_right, &m_data_filter_right);
+
+    point_t Aleft, Bleft, Aright, Bright;
+    gvtGet(&m_data_filter_left, &Aleft, &Bleft);
+    gvtGet(&m_data_filter_right, &Aright, &Bright);
+    qDebug() << "Aleft line = " << Aleft.line << "Aleft col = " << Aleft.col;
+    qDebug() << "Bleft line = " << Bleft.line << "Bleft col = " << Bleft.col;
+    qDebug() << "Aright line = " << Aright.line << "Aright col = " << Aright.col;
+    qDebug() << "Bright line = " << Bright.line << "Bright col = " << Bright.col;
+
+    int leftMedianLine = (Aleft.line + Bleft.line) / 2;
+    int rightMedianLine = (Aright.line + Bright.line) / 2;
+
+    long leftLowerSum = sumMatrix(&m_data_filter_left, 0, leftMedianLine);
+    long leftUpperSum = sumMatrix(&m_data_filter_left, leftMedianLine, LGN_NBR);
+    long rightLowerSum = sumMatrix(&m_data_filter_right, 0, rightMedianLine);
+    long rightUpperSum = sumMatrix(&m_data_filter_right, rightMedianLine, LGN_NBR);
+
+    /*qDebug() << "leftLowerSum = " << leftLowerSum;
+    qDebug() << "leftUpperSum = " << leftUpperSum;
+    qDebug() << "rightLowerSum = " << rightLowerSum;
+    qDebug() << "rightUpperSum = " << rightUpperSum;*/
+
+    long totalSum = leftLowerSum + leftUpperSum + rightLowerSum + rightUpperSum;
+    double gravity = (double)(leftLowerSum + rightLowerSum) / (double)totalSum;
+    //qDebug() << "gravity = " << gravity;
+
+    double alpha = 2.0 / 3.0;
+    double igravity = 0;
+    if( gravity >= alpha)
+        igravity = 0;
+    else
+        igravity = (uint8_t)(((alpha - gravity) / alpha) * 17);
+    qDebug() << "igravity = " << igravity;
+
+    return igravity;
+}
+
+int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
+
+    line_zone_t   zx[10];
+    column_zone_t zy[10];
+    QVector <double> *linSum = new QVector <double> ();
+    QVector <double> *colSum = new QVector <double> ();
+    int moy = 0;
+    int val = 0;
+    int index = 0;
+
+    // make sum tab for each lines*/
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        int sum = 0;
+        for(int j = 0; j < COL_NBR; j++)
+        {
+            sum += matrix_filter->at(i).at(j);
+        }
+        linSum->append(sum);
+    }
+
+    // mean of lines sum
+    moy = 0;
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        moy += linSum->at(i);
+    }
+    moy /= LGN_NBR;
+    //qDebug() << moy;
+
+    //find zones
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        if( (linSum->at(i) > moy) && (val < moy))
+        {
+            zx[index].index = index;
+            zx[index].start_line = i;
+        }
+
+        if( ( (linSum->at(i) < moy) || (i==LGN_NBR-1)) && (val > moy))
+        {
+            zx[index].end_line = i;
+            zx[index].n_lines = zx[index].end_line - zx[index].start_line;
+            qDebug() << "zone X " << index << "start from " << zx[index].start_line << "to line " << zx[index].end_line;
+            index ++;
+        }
+        val = linSum->at(i);
+    }
+
+    /* if more than 2 zones, sort so as to keep the two biggest and order from top */
+    if( index > 2)
+    {
+        /* sort and take the two biggest zones */
+        qsort( (void *)zx, index, sizeof(line_zone_t), compare_n_lines);
+        qsort( (void *)zx, 2, sizeof(line_zone_t), compare_index);
+        index = 2;
+    }
+    else if( index <= 1)
+    {
+        //Problem of positionnement
+    }
+
+    // Zone Highest
+    // make column sum for each columns*/
+    colSum->clear();
+    for( int j = 0; j < COL_NBR; j++)
+    {
+        int sum = 0;
+        for(int i = zx[1].start_line; i < zx[1].end_line; i++)
+        {
+            sum += matrix_filter->at(i).at(j);
+        }
+        colSum->append(sum);
+    }
+
+    // mean of columns sum
+    moy = 0;
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        moy += colSum->at(i);
+    }
+    moy /= COL_NBR;
+
+    //find zones
+    val = index = 0;
+    memset( (void *)zy, 0, sizeof(zy));
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        if( (colSum->at(i) > moy) && (val < moy))
+        {
+            zy[index].index = index;
+            zy[index].start_col = i;
+        }
+        if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        {
+            zy[index].end_col = i;
+            zy[index].n_col = zy[index].end_col - zy[index].start_col;
+            //qDebug() << "zone Y " << index << "start from " << zy[index].start_col << "to line " << zy[index].end_col;
+            index ++;
+        }
+        val = colSum->at(i);
+    }
+
+    //Count zone number
+    if( index > 1)
+    {
+        /* sort and take biggest one */
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
+        //qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        index = 1;
+    }
+    else if( !index)
+    {
+        //Problem of positionnement
+    }
+
+    qDebug() << "TOPZONE LEFT is lines [" << zx[1].start_line << "," << zx[1].end_line << "] and columns [" << zy[0].start_col << "," << zy[0].end_col << "]" ;
+
+    /* calcul des coordonnées du barycentre */
+    uint32_t bi = 0, bj = 0, coef_sum = 0;
+
+    for( uint8_t i = zx[1].start_line; i < zx[1].end_line; i++)
+    {
+        for( uint8_t j = zy[0].start_col; j < zy[0].end_col; j++)
+        {
+            bi += matrix_filter->at(i).at(j) * i;
+            bj += matrix_filter->at(i).at(j) * j;
+            coef_sum += matrix_filter->at(i).at(j);
+        }
+    }
+
+    bi /= coef_sum;
+    bj /= coef_sum;
+
+    qDebug() << "brycentre" << bi << bj;
+
+    //Find extremums
+    bool found = false;
+    point_t A, B;
+
+    //Find first toe point
+    for( int i = LGN_NBR - 1; (i >= 0) && (found == false); i--)
+            for( int j = COL_NBR - 1; j >= 0; j--)
+                if( m_data_bin_left.at(i).at(j))
+                {
+                    A.line = i;
+                    A.col  = j;
+                    found   = true;
+                    break;
+                }
+
+    found = false;
+
+    //Find first heel point
+    for( int i = 0; (i < LGN_NBR) && (found == false); i++)
+        for( int8_t j = COL_NBR - 1; j >= 0; j--)
+            if( m_data_bin_left.at(i).at(j))
+            {
+                B.line = i;
+                B.col  = j;
+                found   = true;
+                break;
+            }
+
+    qDebug() << "toe point" << A.line << A.col;
+    qDebug() << "heel point" << B.line << B.col;
+
+    double a = ((double)B.col - (double)A.col) / ((double)B.line - (double)A.line);
+    double b =  (double)A.col - (a * (double)A.line);
+
+    double tcol = (double)bi * a + b;
+    tcol -= 2.;
+
+    double dev = bj - tcol;
+    qDebug() << "dev left" << dev;
+
+    return dev;
+
+}
+
+int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter){
+
+    line_zone_t   zx[10];
+    column_zone_t zy[10];
+    QVector <double> *linSum = new QVector <double> ();
+    QVector <double> *colSum = new QVector <double> ();
+    int moy = 0;
+    int val = 0;
+    int index = 0;
+
+    // make sum tab for each lines*/
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        int sum = 0;
+        for(int j = 0; j < COL_NBR; j++)
+        {
+            sum += matrix_filter->at(i).at(j);
+        }
+        linSum->append(sum);
+    }
+
+    // mean of lines sum
+    moy = 0;
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        moy += linSum->at(i);
+    }
+    moy /= LGN_NBR;
+    //qDebug() << moy;
+
+    //find zones
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        if( (linSum->at(i) > moy) && (val < moy))
+        {
+            zx[index].index = index;
+            zx[index].start_line = i;
+        }
+
+        if( ( (linSum->at(i) < moy) || (i==LGN_NBR-1)) && (val > moy))
+        {
+            zx[index].end_line = i;
+            zx[index].n_lines = zx[index].end_line - zx[index].start_line;
+            //qDebug() << "zone X " << index << "start from " << zx[index].start_line << "to line " << zx[index].end_line;
+            index ++;
+        }
+        val = linSum->at(i);
+    }
+
+    //Count zone number
+    if( index > 2)
+    {
+        /* sort and take the two biggest zones */
+        qsort( (void *)zx, index, sizeof(line_zone_t), compare_n_lines);
+        qsort( (void *)zx, 2, sizeof(line_zone_t), compare_index);
+        index = 2;
+    }
+    else if( index <= 1)
+    {
+        //Problem of positionnement
+    }
+
+    // Zone Highest
+    // make column sum for each columns*/
+    colSum->clear();
+    for( int j = 0; j < COL_NBR; j++)
+    {
+        int sum = 0;
+        for(int i = zx[1].start_line; i < zx[1].end_line; i++)
+        {
+            sum += matrix_filter->at(i).at(j);
+        }
+        colSum->append(sum);
+    }
+
+    // mean of columns sum
+    moy = 0;
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        moy += colSum->at(i);
+    }
+    moy /= COL_NBR;
+
+    //find zones
+    val = index = 0;
+    memset( (void *)zy, 0, sizeof(zy));
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        if( (colSum->at(i) > moy) && (val < moy))
+        {
+            zy[index].index = index;
+            zy[index].start_col = i;
+        }
+        if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        {
+            zy[index].end_col = i;
+            zy[index].n_col = zy[index].end_col - zy[index].start_col;
+            qDebug() << "zone Y " << index << "start from " << zy[index].start_col << "to line " << zy[index].end_col;
+            index ++;
+        }
+        val = colSum->at(i);
+    }
+
+    //Count zone number
+    if( index > 1)
+    {
+        /* sort and take biggest one */
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
+        //qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        index = 1;
+    }
+    else if( !index)
+    {
+        //Problem of positionnement
+    }
+
+    qDebug() << "TOPZONE RIGHT is lines [" << zx[1].start_line << "," << zx[1].end_line << "] and columns [" << zy[0].start_col << "," << zy[0].end_col << "]" ;
+
+    /* calcul des coordonnées du barycentre */
+    uint32_t bi = 0, bj = 0, coef_sum = 0;
+
+    for( uint8_t i = zx[1].start_line; i < zx[1].end_line; i++)
+    {
+        for( uint8_t j = zy[0].start_col; j < zy[0].end_col; j++)
+        {
+            bi += matrix_filter->at(i).at(j) * i;
+            bj += matrix_filter->at(i).at(j) * j;
+            coef_sum += matrix_filter->at(i).at(j);
+        }
+    }
+
+    bi /= coef_sum;
+    bj /= coef_sum;
+
+    qDebug() << "barycentre" << bi << bj;
+
+    //Find extremums
+    bool found = false;
+    point_t A, B;
+
+    //Find first toe point
+    for( int i = LGN_NBR - 1; (i >= 0) && (found == false); i--)
+            for( int j = 0; j < COL_NBR; j++)
+                if( m_data_bin_right.at(i).at(j))
+                {
+                    A.line = i;
+                    A.col  = j;
+                    found   = true;
+                    break;
+                }
+
+    found = false;
+
+    //Find first heel point
+    for( int i = 0; (i < LGN_NBR) && (found == false); i++)
+        for( int8_t j = 0; j < COL_NBR; j++)
+            if( m_data_bin_left.at(i).at(j))
+            {
+                B.line = i;
+                B.col  = j;
+                found   = true;
+                break;
+            }
+
+    qDebug() << "toe point" << A.line << A.col;
+    qDebug() << "heel point" << B.line << B.col;
+
+    double a = ((double)B.col - (double)A.col) / ((double)B.line - (double)A.line);
+    double b =  (double)A.col - (a * (double)A.line);
+
+    double tcol = (double)bi * a + b;
+    tcol += 2.;
+
+    double dev = tcol - bj;
+    qDebug() << "dev right" << dev;
+
+    return dev;
+
+}
+
+void MainWindow::filterMatrix(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin, QVector <QVector <double> > *matrix_filter)
+{
+    matrix_filter->clear();
+
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        QVector<double> foo;
+
+        for( int j = 0; j < COL_NBR; j++)
+        {
+
+            if(matrix_bin->at(i).at(j) == 1)
+               foo.append(matrix->at(i).at(j));
+            else foo.append(0);
+        }
+
+        matrix_filter->append(foo);
+    }
+
+}
+
+void MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, point_t *B)
+{
+    line_zone_t   zx[10];
+    column_zone_t zy[10];
+    QVector <double> *linSum = new QVector <double> ();
+    QVector <double> *colSum = new QVector <double> ();
+    int moy = 0;
+    int val = 0;
+    int index = 0;
+
+    // make sum tab for each lines*/
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        int sum = 0;
+        for(int j = 0; j < COL_NBR; j++)
+        {
+            sum += matrix_filter->at(i).at(j);
+        }
+        linSum->append(sum);
+    }
+    //qDebug() << *linSum;
+
+    // mean of lines sum
+    moy = 0;
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        moy += linSum->at(i);
+    }
+    moy /= LGN_NBR;
+    //qDebug() << moy;
+
+    //find zones
+    for( int i = 0; i < LGN_NBR; i++)
+    {
+        if( (linSum->at(i) > moy) && (val < moy))
+        {
+            zx[index].index = index;
+            zx[index].start_line = i;
+        }
+
+        if( ( (linSum->at(i) < moy) || (i==LGN_NBR-1)) && (val > moy))
+        {
+            zx[index].end_line = i;
+            zx[index].n_lines = zx[index].end_line - zx[index].start_line;
+            //qDebug() << "zone X " << index << "start from " << zx[index].start_line << "to line " << zx[index].end_line;
+            index ++;
+        }
+        val = linSum->at(i);
+    }
+
+    //Count zone number
+    if( index > 2)
+    {
+        /* sort and take the two biggest zones */
+        qsort( (void *)zx, index, sizeof(line_zone_t), compare_n_lines);
+        qsort( (void *)zx, 2, sizeof(line_zone_t), compare_index);
+        index = 2;
+    }
+    else if( index <= 1)
+    {
+        //Problem of positionnement
+    }
+
+    //qDebug()<< "zone X heel = " << zx[0].start_line << "to " << zx[0].end_line;
+    //qDebug()<< "zone X toe = "  << zx[1].start_line << "to " << zx[1].end_line;
+
+    //Zone heel
+    // make column sum for each columns*/
+    colSum->clear();
+    for( int j = 0; j < COL_NBR; j++)
+    {
+        int sum = 0;
+        for(int i = zx[0].start_line; i < zx[0].end_line; i++)
+        {
+            sum += matrix_filter->at(i).at(j);
+        }
+        colSum->append(sum);
+    }
+
+    // mean of columns sum
+    moy = 0;
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        moy += colSum->at(i);
+    }
+    moy /= COL_NBR;
+    //qDebug() << moy;
+
+    //find zones
+    val = index = 0;
+    memset( (void *)zy, 0, sizeof(zy));
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        if( (colSum->at(i) > moy) && (val < moy))
+        {
+            zy[index].index = index;
+            zy[index].start_col = i;
+        }
+        if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        {
+            zy[index].end_col = i;
+            zy[index].n_col = zy[index].end_col - zy[index].start_col;
+            //qDebug() << "zone Y " << index << "start from " << zy[index].start_col << "to line " << zy[index].end_col;
+            index ++;
+        }
+        val = colSum->at(i);
+    }
+
+    //Count zone number
+    if( index > 1)
+    {
+        /* sort and take biggest one */
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        index = 1;
+    }
+    else if( !index)
+    {
+        //Problem of positionnement
+    }
+
+    A->line = (zx[0].start_line + zx[0].end_line) / 2;
+    A->col  = (zy[0].start_col + zy[0].end_col) / 2;
+
+    //qDebug() << "A line " << A->line << "A col " << A->col;
+
+    //Zone toe
+    // make column sum for each columns
+    colSum->clear();
+    for( int j = 0; j < COL_NBR; j++)
+    {
+        int sum = 0;
+        for(int i = zx[1].start_line; i < zx[1].end_line; i++)
+        {
+            sum += matrix_filter->at(i).at(j);
+        }
+        colSum->append(sum);
+    }
+
+    // mean of columns sum
+    moy = 0;
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        moy += colSum->at(i);
+    }
+    moy /= COL_NBR;
+    //qDebug() << moy;
+
+    //find zones
+    val = index = 0;
+    memset( (void *)zy, 0, sizeof(zy));
+    for( int i = 0; i < COL_NBR; i++)
+    {
+        if( (colSum->at(i) > moy) && (val < moy))
+        {
+            zy[index].index = index;
+            zy[index].start_col = i;
+        }
+        if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        {
+            zy[index].end_col = i;
+            zy[index].n_col = zy[index].end_col - zy[index].start_col;
+            //qDebug() << "zone Y " << index << "start from " << zy[index].start_col << "to line " << zy[index].end_col;
+            index ++;
+        }
+        val = colSum->at(i);
+    }
+
+    //Count zone number
+    if( index > 1)
+    {
+        /* sort and take biggest one */
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        index = 1;
+    }
+    else if( !index)
+    {
+        //Problem of positionnement
+    }
+
+    B->line = (zx[1].start_line + zx[1].end_line) / 2;
+    B->col  = (zy[0].start_col + zy[0].end_col) / 2;
+
+    //qDebug() << "B line " << B->line << "B col " << B->col;
+
 }
 
 void MainWindow::get_hilo_pos(QVector <QVector <double> > *matrix, int *hi, int *low)
@@ -1233,4 +1902,62 @@ void MainWindow::showStatusMessage(const QString &message)
     m_status->setText(message);
 }
 
+int MainWindow::compare_n_lines(const void *a, const void *b)
+{
+    struct line_zone_t{
+        int 	index;
+        int		start_line;
+        int 	end_line;
+        int		n_lines;
+    };
 
+    uint8_t	n_line_a = ((line_zone_t *)a)->n_lines;
+    uint8_t	n_line_b = ((line_zone_t *)b)->n_lines;
+
+    return (n_line_a < n_line_b) - (n_line_a > n_line_b);
+
+}
+
+int MainWindow::compare_index( const void *a, const void *b)
+{
+    struct line_zone_t{
+        int 	index;
+        int		start_line;
+        int 	end_line;
+        int		n_lines;
+    };
+
+    uint8_t index_a = ((line_zone_t *)a)->index;
+    uint8_t index_b = ((line_zone_t *)b)->index;
+    return (index_a > index_b) - (index_a < index_b);
+}
+
+int MainWindow::compare_n_cols( const void *a, const void *b)
+{
+    struct column_zone_t{
+        int 	index;
+        int		start_col;
+        int 	end_col;
+        int		n_col;
+    };
+
+    uint8_t n_col_a = ((column_zone_t *)a)->n_col;
+    uint8_t n_col_b = ((column_zone_t *)b)->n_col;
+    return (n_col_a < n_col_b) - (n_col_a > n_col_b);
+}
+
+long MainWindow::sumMatrix(QVector <QVector <double> > *matrix, int startLine, int endLine){
+
+    long sum = 0;
+
+    for(int i = startLine; i < endLine; i++)
+    {
+        for( int j = 0; j < COL_NBR; j++)
+        {
+               sum += matrix->at(i).at(j);
+        }
+
+    }
+
+    return sum;
+}

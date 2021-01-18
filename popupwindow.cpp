@@ -162,5 +162,3 @@ int PopupWindow::getNoiseMargin(void)
 {
     return d_plot_left->getNoiseMargin();
 }
-
-
