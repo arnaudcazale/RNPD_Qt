@@ -209,17 +209,17 @@ void MainWindow::readData()
              QByteArray data = m_serial->read(2);
              unsigned int word = (static_cast<unsigned int>(data[0]) & 0xFF) + ((static_cast<unsigned int>(data[1]) & 0xFF) << 8 ) ;
              m_data->append((double)word);
-             if(m_data->size() >= 768)
+             if(m_data->size() >= 1536)
              {
                  filling = false;
                  m_count++;
 
-                 qDebug() << *m_data;
+                 qDebug() << "*m_data" << *m_data;
 
-                 //splitData();
-                 splitDataFillZero();
-                 fillLeftDataMeanNeightboorhood();
-                 fillRightDataMeanNeightboorhood();
+                 splitData();
+                 //splitDataFillZero();
+                 //fillLeftDataMeanNeightboorhood();
+                 //fillRightDataMeanNeightboorhood();
                  emit dataReady_left(&m_data_left);
                  emit dataReady_right(&m_data_right);
 
@@ -291,28 +291,33 @@ void MainWindow::readData()
 
 void MainWindow::splitData()
 {
-    /*m_data_left->clear();
-    m_data_right->clear();
+    m_data_left.clear();
+    m_data_right.clear();
 
-    for(int i = (m_data->size() / 2); i > 0 ; i-=8)
+    QVector <double>  left;
+    QVector <double>  right;
+
+    for(int i = 0; i < m_data->size()/2; i+=16)
     {
-        for(int j = 8; j > 0; j--)
+        for(int j = 0; j <16; j++)
         {
-            m_data_left->append(m_data->at(i-j));
+            left.append(m_data->at(i+j));
         }
+        m_data_left.append(left);
+        left.clear();
     }
-    qDebug()<< "data_left" <<*m_data_left;
 
-    for(int i = m_data->size(); i > (m_data->size() / 2) ; i-=8)
+    for(int i = m_data->size()/2; i < m_data->size(); i+=16)
     {
-        for(int j = 8; j > 0; j--)
+        for(int j = 0; j < 16; j++)
         {
-            m_data_right->append(m_data->at(i-j));
+            right.append(m_data->at(i+j));
         }
+        m_data_right.append(right);
+        right.clear();
     }
-    qDebug()<< "data_right" <<*m_data_right;
 
-    m_data->clear();*/
+    m_data->clear();
 }
 
 void MainWindow::splitDataFillZero()
