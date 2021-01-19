@@ -258,9 +258,9 @@ void MainWindow::readData()
                  qDebug() << "dev_total" << dev;
                  dataDisplay_gravity.append("deviation moyenne = " + QString::number(dev) + "\n");
 
-                 if( dev <= -2)
+                 if( dev < -2)
                      dataDisplay_gravity.append("SUPINAL\n");
-                 else if( dev >= 0)
+                 else if( dev > 0)
                      dataDisplay_gravity.append("CONTROL\n");
                  else
                      dataDisplay_gravity.append("NEUTRE\n");
