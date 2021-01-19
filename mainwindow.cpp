@@ -242,7 +242,7 @@ void MainWindow::readData()
 
                  dataDisplay.clear();
                  dataDisplay_pointure.clear();
-                 m_lines.clear();
+                 m_lines.clear();*/
 
                  //Pronation computing
                  int grav = calc_gravity();
@@ -256,16 +256,17 @@ void MainWindow::readData()
                  int dev = (devLeft + devRight) /2;
 
                  qDebug() << "dev_total" << dev;
+                 dataDisplay_gravity.append("deviation moyenne = " + QString::number(dev) + "\n");
 
-                 if( dev == 0)
+                 if( dev <= -2)
+                     dataDisplay_gravity.append("SUPINAL\n");
+                 else if( dev >= 0)
+                     dataDisplay_gravity.append("CONTROL\n");
+                 else
                      dataDisplay_gravity.append("NEUTRE\n");
-                     else if( dev > 0)
-                         dataDisplay_gravity.append("CONTROL\n");
-                     else
-                         dataDisplay_gravity.append("SUPINAL\n");
 
                  m_display_gravity->putData(dataDisplay_gravity);
-                 dataDisplay_gravity.clear();*/
+                 dataDisplay_gravity.clear();
              }
          }else
          {
@@ -1242,6 +1243,8 @@ int MainWindow::calc_gravity(void){
 
     int leftMedianLine = (Aleft.line + Bleft.line) / 2;
     int rightMedianLine = (Aright.line + Bright.line) / 2;
+    qDebug()<< "leftMedianLine" << leftMedianLine;
+    qDebug()<< "rightMedianLine" << rightMedianLine;
 
     long leftLowerSum = sumMatrix(&m_data_filter_left, 0, leftMedianLine);
     long leftUpperSum = sumMatrix(&m_data_filter_left, leftMedianLine, LGN_NBR);
@@ -1439,7 +1442,7 @@ int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
     double b =  (double)A.col - (a * (double)A.line);
 
     double tcol = (double)bi * a + b;
-    tcol -= 2.;
+    //tcol -= 2.;
 
     double dev = bj - tcol;
     qDebug() << "dev left" << dev;
@@ -1604,7 +1607,7 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
     //Find first heel point
     for( int i = 0; (i < LGN_NBR) && (found == false); i++)
         for( int8_t j = 0; j < COL_NBR; j++)
-            if( m_data_bin_left.at(i).at(j))
+            if( m_data_bin_right.at(i).at(j))
             {
                 B.line = i;
                 B.col  = j;
@@ -1619,7 +1622,7 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
     double b =  (double)A.col - (a * (double)A.line);
 
     double tcol = (double)bi * a + b;
-    tcol += 2.;
+    //tcol += 2.;
 
     double dev = tcol - bj;
     qDebug() << "dev right" << dev;
