@@ -143,6 +143,8 @@ private:
     static int compare_index(const void *a, const void *b);
     static int compare_n_cols( const void *a, const void *b);
     static long sumMatrix(QVector <QVector <double> > *matrix, int startLine, int endLine);
+    void computeGravity();
+    void computeSize();
 
 private:
     void showStatusMessage(const QString &message);
@@ -172,6 +174,8 @@ private:
 
     int m_count;
     bool filling;
+    bool gravity;
+    bool size;
     static const int LGN_NBR = 48;
     static const int COL_NBR = 16;
     static const unsigned int START_MARKER = 0xFFFE;

@@ -83,6 +83,8 @@ MainWindow::MainWindow(QWidget *parent) :
 //! [0]
     m_count = 0;
     filling = false;
+    gravity = true;
+    size = false;
 
     for(int i = 0; i < LGN_NBR; i++) //of course you might not want to init the vectors in a loop - this is just an example
     {
@@ -214,7 +216,7 @@ void MainWindow::readData()
                  filling = false;
                  m_count++;
 
-                 qDebug() << "*m_data" << *m_data;
+                 //qDebug() << "*m_data" << *m_data;
 
                  splitData();
                  //splitDataFillZero();
@@ -223,9 +225,22 @@ void MainWindow::readData()
                  emit dataReady_left(&m_data_left);
                  emit dataReady_right(&m_data_right);
 
-                 /*
+                 if(gravity)
+                 {
+                     gravity = false;
+                     size = true;
+                     computeGravity();
+                 }
+
+                 if(size)
+                 {
+                     size = false;
+                     gravity = true;
+                     computeSize();
+                 }
+
                  //size computing
-                 double size = calc_size();
+                 /*double size = calc_size();
                  m_pointure.append(size);
 
                  if( (m_count % 2) == 0)
@@ -244,29 +259,7 @@ void MainWindow::readData()
                  dataDisplay_pointure.clear();
                  m_lines.clear();*/
 
-                 //Pronation computing
-                 int grav = calc_gravity();
-                 dataDisplay_gravity.append("GRAVITY = " + QString::number(grav) + "\n");
 
-                 emit dataReadyGravity_left(&m_data_filter_left);
-                 emit dataReadyGravity_right(&m_data_filter_right);
-
-                 int devLeft = calc_pronation_left(&m_data_filter_left);
-                 int devRight = calc_pronation_right(&m_data_filter_right);
-                 int dev = (devLeft + devRight) /2;
-
-                 qDebug() << "dev_total" << dev;
-                 dataDisplay_gravity.append("deviation moyenne = " + QString::number(dev) + "\n");
-
-                 if( dev < -2)
-                     dataDisplay_gravity.append("SUPINAL\n");
-                 else if( dev > 0)
-                     dataDisplay_gravity.append("CONTROL\n");
-                 else
-                     dataDisplay_gravity.append("NEUTRE\n");
-
-                 m_display_gravity->putData(dataDisplay_gravity);
-                 dataDisplay_gravity.clear();
              }
          }else
          {
@@ -289,6 +282,39 @@ void MainWindow::readData()
          }
      }
 }
+
+void MainWindow::computeGravity(){
+
+    //Pronation computing
+    int grav = calc_gravity();
+    dataDisplay_gravity.append("GRAVITY = " + QString::number(grav) + "\n");
+
+    emit dataReadyGravity_left(&m_data_filter_left);
+    emit dataReadyGravity_right(&m_data_filter_right);
+
+    int devLeft = calc_pronation_left(&m_data_filter_left);
+    int devRight = calc_pronation_right(&m_data_filter_right);
+    int dev = (devLeft + devRight) /2;
+
+    qDebug() << "dev_total" << dev;
+    dataDisplay_gravity.append("deviation moyenne = " + QString::number(dev) + "\n");
+
+    if( dev < -2)
+        dataDisplay_gravity.append("SUPINAL\n");
+    else if( dev > 0)
+        dataDisplay_gravity.append("CONTROL\n");
+    else
+        dataDisplay_gravity.append("NEUTRE\n");
+
+    m_display_gravity->putData(dataDisplay_gravity);
+    dataDisplay_gravity.clear();
+
+}
+
+void MainWindow::computeSize(){
+
+}
+
 
 void MainWindow::splitData()
 {
@@ -780,7 +806,7 @@ void MainWindow::get_extr_axial_left(QVector <QVector <double> > *matrix_bin, un
         }
     }
 
-    qDebug() << *tab;
+    //qDebug() << "sumTab" << *tab;
 
     // bottom half -> xa, ya
     *xa = COL_NBR - 1  ;

@@ -44,7 +44,7 @@ private:
 
 void Overlay::set_coordonnees(QVector <QLine> lines)
 {
-    qDebug() << lines;
+    //qDebug() << lines;
     for(int i=0; i<lines.size(); i++)
     {
         m_lines.replace(i, lines.at(i) );
@@ -411,7 +411,7 @@ void Plot::printPlot()
 void Plot::setMatrixData(QVector < QVector<double> > *dataMatrix)
 {
     //int max = *std::max_element(dataMatrix->constBegin(), dataMatrix->constEnd());
-    qDebug()<<"plot.Cpp" <<d_noise_margin;
+    //qDebug()<<"plot.Cpp" <<d_noise_margin;
     m_matrix_data->clear();
     m_matrix_data_noise->clear();
 
@@ -529,7 +529,7 @@ void Plot::drawLine(QVector <QLine> lines)
 void Plot::updateNoiseMargin(int noiseMargin)
 {
     d_noise_margin = noiseMargin;
-    qDebug() << d_noise_margin;
+    //qDebug() << d_noise_margin;
 }
 
 int Plot::getNoiseMargin(void)
