@@ -563,7 +563,8 @@ void MainWindow::binarizeFromMean(QVector <QVector <double> > *matrix, QVector <
     matrix_bin->clear();
 
     // calculate means of both matrixes
-    unsigned int mean = calc_mean(matrix);
+    double mean = calc_mean(matrix);
+    qDebug() << "matrix_mean" << mean;
     //unsigned int mean_right = calc_mean(&m_data_right);
     //unsigned int mean = (mean_left + mean_right)/2;
 
@@ -1250,6 +1251,7 @@ int MainWindow::calc_gravity(void){
     qDebug() << "rightUpperSum = " << rightUpperSum;
 
     long totalSum = leftLowerSum + leftUpperSum + rightLowerSum + rightUpperSum;
+    qDebug() << "totalSum = " << totalSum;
     double gravity = (double)(leftLowerSum + rightLowerSum) / (double)totalSum;
     qDebug() << "gravity = " << gravity;
 
@@ -1597,7 +1599,9 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
 
     found = false;
 
-    //Find first heel point
+
+
+
     for( int i = 0; (i < LGN_NBR) && (found == false); i++)
         for( int8_t j = 0; j < COL_NBR; j++)
             if( m_data_bin_right.at(i).at(j))
