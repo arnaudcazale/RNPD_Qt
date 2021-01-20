@@ -209,7 +209,7 @@ void MainWindow::readData()
              QByteArray data = m_serial->read(2);
              unsigned int word = (static_cast<unsigned int>(data[0]) & 0xFF) + ((static_cast<unsigned int>(data[1]) & 0xFF) << 8 ) ;
              m_data->append((double)word);
-             if(m_data->size() >= 1536)
+             if(m_data->size() >= 1536)//1536
              {
                  filling = false;
                  m_count++;
@@ -538,13 +538,6 @@ void MainWindow::binarizeFromNoiseMargin(QVector <QVector <double> > *matrix, QV
 {
     matrix_bin->clear();
 
-    // calculate means of both matrixes
-    unsigned int mean_left = calc_mean(&m_data_left);
-    unsigned int mean_right = calc_mean(&m_data_right);
-    unsigned int mean = (mean_left + mean_right)/2;
-
-    //qDebug() << mean;
-
     int noiseMargin = m_popupwindow->getNoiseMargin();
     qDebug() << noiseMargin;
 
@@ -570,9 +563,9 @@ void MainWindow::binarizeFromMean(QVector <QVector <double> > *matrix, QVector <
     matrix_bin->clear();
 
     // calculate means of both matrixes
-    unsigned int mean_left = calc_mean(&m_data_left);
-    unsigned int mean_right = calc_mean(&m_data_right);
-    unsigned int mean = (mean_left + mean_right)/2;
+    unsigned int mean = calc_mean(matrix);
+    //unsigned int mean_right = calc_mean(&m_data_right);
+    //unsigned int mean = (mean_left + mean_right)/2;
 
     for(int i = 0; i < LGN_NBR ; i++)
     {
@@ -1251,14 +1244,14 @@ int MainWindow::calc_gravity(void){
     long rightLowerSum = sumMatrix(&m_data_filter_right, 0, rightMedianLine);
     long rightUpperSum = sumMatrix(&m_data_filter_right, rightMedianLine, LGN_NBR);
 
-    /*qDebug() << "leftLowerSum = " << leftLowerSum;
+    qDebug() << "leftLowerSum = " << leftLowerSum;
     qDebug() << "leftUpperSum = " << leftUpperSum;
     qDebug() << "rightLowerSum = " << rightLowerSum;
-    qDebug() << "rightUpperSum = " << rightUpperSum;*/
+    qDebug() << "rightUpperSum = " << rightUpperSum;
 
     long totalSum = leftLowerSum + leftUpperSum + rightLowerSum + rightUpperSum;
     double gravity = (double)(leftLowerSum + rightLowerSum) / (double)totalSum;
-    //qDebug() << "gravity = " << gravity;
+    qDebug() << "gravity = " << gravity;
 
     double alpha = 2.0 / 3.0;
     double igravity = 0;
