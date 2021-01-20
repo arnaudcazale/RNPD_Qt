@@ -232,12 +232,12 @@ void MainWindow::readData()
                      computeGravity();
                  }
 
-                 if(size)
+                 /*if(size)
                  {
                      size = false;
                      gravity = true;
                      computeSize();
-                 }
+                 }*/
 
                  //size computing
                  /*double size = calc_size();
