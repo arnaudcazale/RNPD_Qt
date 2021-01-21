@@ -461,41 +461,44 @@ void Plot::cancelNoise(bool on)
     d_noise_cancel = on;
     m_matrix_data_noise->clear();
 
-    if(d_noise_cancel)
-    {
-        QVector<double> foo(0);
-        QVector<double> foo_noise(0);
+    if((m_matrix_data->size()!=0)){
 
-        for(int i = 0; i <LGN_NBR; i++)
+        if(d_noise_cancel )
         {
-            for(int j = 0; j < COL_NBR; j++)
+            QVector<double> foo(0);
+            QVector<double> foo_noise(0);
+
+            for(int i = 0; i <LGN_NBR; i++)
             {
-                foo.append(m_matrix_data->at(i).at(j));
-                foo_noise.append(m_matrix_data->at(i).at(j));
-
-                if(foo.at(j) < d_noise_margin)
+                for(int j = 0; j < COL_NBR; j++)
                 {
-                    foo_noise.replace(j, 0);
+                    foo.append(m_matrix_data->at(i).at(j));
+                    foo_noise.append(m_matrix_data->at(i).at(j));
+
+                    if(foo.at(j) < d_noise_margin)
+                    {
+                        foo_noise.replace(j, 0);
+                    }
+
                 }
+                m_matrix_data_noise->append(foo_noise);
 
+                foo.clear();
+                foo_noise.clear();
             }
-            m_matrix_data_noise->append(foo_noise);
 
-            foo.clear();
-            foo_noise.clear();
+            SpectrogramData *matrix = new SpectrogramData(m_matrix_data_noise);
+            d_spectrogram->setData( matrix );
+        }else
+        {
+            SpectrogramData *matrix = new SpectrogramData(m_matrix_data);
+            d_spectrogram->setData( matrix );
         }
 
-        SpectrogramData *matrix = new SpectrogramData(m_matrix_data_noise);
-        d_spectrogram->setData( matrix );
-    }else
-    {
-        SpectrogramData *matrix = new SpectrogramData(m_matrix_data);
-        d_spectrogram->setData( matrix );
+        setResampleMode(d_mode);
+        //updateScale(max);
+        replot();
     }
-
-    setResampleMode(d_mode);
-    //updateScale(max);
-    replot();
 
 }
 

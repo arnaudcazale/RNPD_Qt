@@ -239,11 +239,9 @@ void MainWindow::readData()
                      computeGravity();
                  }
 
-                 if(size)
+                 else if(size)
                  {
                      m_count++;
-                     size = false;
-                     gravity = true;
                      computeSize();
                  }
              }
@@ -272,11 +270,11 @@ void MainWindow::readData()
 void MainWindow::computeGravity(){
 
     //Pronation computing
+    emit dataReadyGravity_left(&m_data_left);
+    emit dataReadyGravity_right(&m_data_right);
+
     int grav = calc_gravity();
     dataDisplay_gravity.append("GRAVITY = " + QString::number(grav) + "\n");
-
-    emit dataReadyGravity_left(&m_data_filter_left);
-    emit dataReadyGravity_right(&m_data_filter_right);
 
     int devLeft = calc_pronation_left(&m_data_filter_left);
     int devRight = calc_pronation_right(&m_data_filter_right);
@@ -300,8 +298,12 @@ void MainWindow::computeGravity(){
 void MainWindow::computeSize(){
 
     //size computing
+    emit dataReady_left(&m_data_left);
+    emit dataReady_right(&m_data_right);
+
     double size = calc_size();
     m_pointure.append(size);
+    emit dataReady_line(m_lines);
 
     if( (m_count % 2) == 0)
     {
@@ -310,13 +312,12 @@ void MainWindow::computeSize(){
         double pointure_round = round(pointure_mean*2)/2;
         dataDisplay_pointure.append(QString::number(pointure_round) + "\n");
         m_display_pointure->putData(dataDisplay_pointure);
+
+        size = false;
+        gravity = true;
     }
 
     m_display->putData(dataDisplay);
-
-    emit dataReady_left(&m_data_left);
-    emit dataReady_right(&m_data_right);
-    emit dataReady_line(m_lines);
 
     dataDisplay.clear();
     dataDisplay_pointure.clear();
