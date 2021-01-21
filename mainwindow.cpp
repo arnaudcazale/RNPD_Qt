@@ -146,6 +146,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(dataReady_line(QVector <QLine>)), m_popupwindow, SLOT(drawLine(QVector <QLine>)));
     connect(this, SIGNAL(dataReadyGravity_left(QVector<QVector <double> > *)), m_popupwindowGravity, SLOT(dataUpdate_left(QVector<QVector <double> > *)));
     connect(this, SIGNAL(dataReadyGravity_right(QVector<QVector <double> > *)), m_popupwindowGravity, SLOT(dataUpdate_right(QVector<QVector <double> > *)));
+    connect(this, SIGNAL(dataReadyGravity_line(QVector <QLine>)), m_popupwindowGravity, SLOT(drawLine(QVector <QLine>)));
 
 }
 //! [3]
@@ -280,6 +281,8 @@ void MainWindow::computeGravity(){
     int devRight = calc_pronation_right(&m_data_filter_right);
     int dev = (devLeft + devRight) /2;
 
+    emit(dataReadyGravity_line(m_linesGravity));
+
     qDebug() << "dev_total" << dev;
     dataDisplay_gravity.append("deviation moyenne = " + QString::number(dev) + "\n");
 
@@ -292,6 +295,7 @@ void MainWindow::computeGravity(){
 
     m_display_gravity->putData(dataDisplay_gravity);
     dataDisplay_gravity.clear();
+    m_linesGravity.clear();
 
 }
 
@@ -1435,10 +1439,119 @@ int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
     bi /= coef_sum;
     bj /= coef_sum;
 
-    qDebug() << "brycentre" << bi << bj;
+    qDebug() << "barycentre" << bj << bi;
+
+    //Find center(neutral) line
+    point_t A, B;
+    gvtGet(&m_data_filter_left, &A, &B);
+    int medianLine = (A.line + B.line) / 2;
+    QVector <int> sumCol;
+    int sum = 0;
+
+    binarizeFromNoiseMargin(&m_data_left, &m_data_bin_left);
+
+    //Make sum of each lines
+    for(int i = 0; i<LGN_NBR; i++)
+    {
+        for(int j = 0 ; j < COL_NBR; j++){
+            sum+=m_data_bin_left.at(i).at(j);
+        }
+        sumCol.append(sum);
+        sum = 0;
+        //qDebug() << m_data_bin_left.at(i);
+    }
+
+    //Find center of largest line below median line, priority to lower line:
+    //Find index of larger line
+    int max = 0;
+    int lineMaxLow = 0;
+    for(int i = medianLine; i>=0; i--)
+    {
+        if(sumCol.at(i) >= max)
+        {
+            lineMaxLow = i;
+            max = sumCol.at(i);
+        }
+    }
+
+    qDebug() << "sumCol" << sumCol;
+
+    //Find left beggining of largest line
+    int startCol = 0;
+    for(int j = 0; j<COL_NBR; j++)
+    {
+        if(m_data_bin_left.at(lineMaxLow).at(j) == 1){
+            startCol = j;
+         break;
+        }
+    }
+
+    //Find right end of largest line
+    int stopCol = 0;
+    for(int j = COL_NBR-1; j>=0; j--)
+    {
+        if(m_data_bin_left.at(lineMaxLow).at(j) == 1){
+            stopCol = j;
+         break;
+        }
+    }
+
+    double centerColLow = ceil( ((double)stopCol-(double)startCol)/2 ) + startCol;
+    qDebug() << "lineMaxLow" << lineMaxLow;
+    qDebug() << "startCol" << startCol << "stopCol" << stopCol;
+    qDebug() << "center of biggest lower line" << centerColLow << lineMaxLow;
+
+    point_t pB;
+    pB.col = (int)centerColLow;
+    pB.line = lineMaxLow;
+
+    //Find center largest line above median line, priority to lower line:
+    //Find index of larger line
+    max = 0;
+    int lineMaxHi = 0;
+    for(int i = medianLine; i<LGN_NBR; i++)
+    {
+        if(sumCol.at(i) >= max)
+        {
+            lineMaxHi = i;
+            max = sumCol.at(i);
+        }
+    }
+
+    //Find left beggining of largest line
+    startCol = 0;
+    for(int j = 0; j<COL_NBR; j++)
+    {
+        if(m_data_bin_left.at(lineMaxHi).at(j) == 1){
+            startCol = j;
+         break;
+        }
+    }
+
+    //Find right end of largest line
+    stopCol = 0;
+    for(int j = COL_NBR-1; j>=0; j--)
+    {
+        if(m_data_bin_left.at(lineMaxHi).at(j) == 1){
+            stopCol = j;
+         break;
+        }
+    }
+
+    double centerColHi = ceil( ((double)stopCol-(double)startCol)/2 ) + startCol;
+    qDebug() << "lineMaxHi" << lineMaxHi;
+    qDebug() << "startCol" << startCol << "stopCol" << stopCol;
+    qDebug() << "center of biggest upper line" << centerColHi << lineMaxHi ;
+
+    point_t pA;
+    pA.col = (int)centerColHi;
+    pA.line = lineMaxHi;
+
+    QLine line(pA.col, pA.line, pB.col, pB.line);
+    m_linesGravity.append(line);
 
     //Find extremums
-    bool found = false;
+    /*bool found = false;
     point_t A, B;
 
     //Find first toe point
@@ -1465,14 +1578,18 @@ int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
                 break;
             }
 
-    qDebug() << "toe point" << A.line << A.col;
-    qDebug() << "heel point" << B.line << B.col;
+    qDebug() << "toe point" << A.col << A.line;
+    qDebug() << "heel point" << B.col <<  B.line;*/
 
-    double a = ((double)B.col - (double)A.col) / ((double)B.line - (double)A.line);
-    double b =  (double)A.col - (a * (double)A.line);
+    double a = ( (double)pA.line - (double)pB.line ) / ( (double)pA.col - (double)pB.col )  ;
+    double b = (double)pA.col - (a * (double)A.line);
+    qDebug() << "Y = " << a <<"x +"<<b;
 
-    double tcol = (double)bi * a + b;
+    double tcol = ((double)bi - b) / a;
+    tcol = ceil(tcol);
     //tcol -= 2.;
+    //double tcol = (double)bi * a + b;
+    qDebug() << "tcol" << tcol;
 
     double dev = bj - tcol;
     qDebug() << "dev left" << dev;
@@ -1615,7 +1732,7 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
     bi /= coef_sum;
     bj /= coef_sum;
 
-    qDebug() << "barycentre" << bi << bj;
+    qDebug() << "barycentre" << bj << bi;
 
     //Find extremums
     bool found = false;
@@ -1634,9 +1751,6 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
 
     found = false;
 
-
-
-
     for( int i = 0; (i < LGN_NBR) && (found == false); i++)
         for( int8_t j = 0; j < COL_NBR; j++)
             if( m_data_bin_right.at(i).at(j))
@@ -1647,8 +1761,11 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
                 break;
             }
 
-    qDebug() << "toe point" << A.line << A.col;
-    qDebug() << "heel point" << B.line << B.col;
+    qDebug() << "toe point" << A.col << A.line;
+    qDebug() << "heel point" << B.col << B.line;
+
+    QLine line(A.col, A.line, B.col, B.line);
+    m_linesGravity.append(line);
 
     double a = ((double)B.col - (double)A.col) / ((double)B.line - (double)A.line);
     double b =  (double)A.col - (a * (double)A.line);
