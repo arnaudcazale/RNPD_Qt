@@ -172,6 +172,7 @@ private:
     QVector <QLine> m_lines;
     QVector <double> m_pointure;
 
+
     int m_count;
     bool filling;
     bool gravity;

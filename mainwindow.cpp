@@ -59,6 +59,8 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QtDebug>
+#include <QDesktopWidget>
+#include <QStyle>
 
 #include "math.h"
 
@@ -104,14 +106,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_ui->setupUi(this);
     m_console->setEnabled(false);
-    m_popupwindow->setMinimumSize(767, 1024);
+    m_popupwindow->resize(900, 800);
     m_popupwindow->show();
-    m_popupwindowGravity->setMinimumSize(767, 1024);
+    m_popupwindowGravity->resize(900, 800);
     m_popupwindowGravity->show();
     m_display->show();
+    m_display->resize(500, 250);
     m_display_pointure->show();
+    m_display_pointure->resize(500, 250);
     m_display_gravity->show();
+    m_display_gravity->resize(500, 250);
     setCentralWidget(m_console);
+
+    m_popupwindow->move(0,0);
+    m_popupwindowGravity->move(950,0);
+    m_display->move(0,800);
+    m_display_pointure->move(500,800);
+    m_display_gravity->move(1000,800);
 
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
@@ -214,16 +225,12 @@ void MainWindow::readData()
              if(m_data->size() >= 1536)//1536
              {
                  filling = false;
-                 m_count++;
-
                  //qDebug() << "*m_data" << *m_data;
 
                  splitData();
                  //splitDataFillZero();
                  //fillLeftDataMeanNeightboorhood();
                  //fillRightDataMeanNeightboorhood();
-                 emit dataReady_left(&m_data_left);
-                 emit dataReady_right(&m_data_right);
 
                  if(gravity)
                  {
@@ -232,34 +239,13 @@ void MainWindow::readData()
                      computeGravity();
                  }
 
-                 /*if(size)
+                 if(size)
                  {
+                     m_count++;
                      size = false;
                      gravity = true;
                      computeSize();
-                 }*/
-
-                 //size computing
-                 /*double size = calc_size();
-                 m_pointure.append(size);
-
-                 if( (m_count % 2) == 0)
-                 {
-                     qDebug()<<m_pointure;
-                     double pointure_mean = ( m_pointure.at(m_pointure.size()-1) + m_pointure.at(m_pointure.size()-2)) / 2;
-                     double pointure_round = round(pointure_mean*2)/2;
-                     dataDisplay_pointure.append(QString::number(pointure_round) + "\n");
-                     m_display_pointure->putData(dataDisplay_pointure);
                  }
-                 m_display->putData(dataDisplay);
-
-                 emit dataReady_line(m_lines);
-
-                 dataDisplay.clear();
-                 dataDisplay_pointure.clear();
-                 m_lines.clear();*/
-
-
              }
          }else
          {
@@ -313,6 +299,28 @@ void MainWindow::computeGravity(){
 
 void MainWindow::computeSize(){
 
+    //size computing
+    double size = calc_size();
+    m_pointure.append(size);
+
+    if( (m_count % 2) == 0)
+    {
+        qDebug()<<m_pointure;
+        double pointure_mean = ( m_pointure.at(m_pointure.size()-1) + m_pointure.at(m_pointure.size()-2)) / 2;
+        double pointure_round = round(pointure_mean*2)/2;
+        dataDisplay_pointure.append(QString::number(pointure_round) + "\n");
+        m_display_pointure->putData(dataDisplay_pointure);
+    }
+
+    m_display->putData(dataDisplay);
+
+    emit dataReady_left(&m_data_left);
+    emit dataReady_right(&m_data_right);
+    emit dataReady_line(m_lines);
+
+    dataDisplay.clear();
+    dataDisplay_pointure.clear();
+    m_lines.clear();
 }
 
 
