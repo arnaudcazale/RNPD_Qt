@@ -37,10 +37,10 @@ PopupWindow::PopupWindow(QWidget *parent) :
     btnPrint->setText( "Print" );
     btnPrint->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
     toolBar->addWidget( btnPrint );
-    connect( btnPrint, SIGNAL( clicked() ),
+    /*connect( btnPrint, SIGNAL( clicked() ),
         d_plot_left, SLOT( printPlot() ) );
     connect( btnPrint, SIGNAL( clicked() ),
-        d_plot_right, SLOT( printPlot() ) );
+        d_plot_right, SLOT( printPlot() ) );*/
 
     toolBar->addSeparator();
 #endif
@@ -124,7 +124,7 @@ void PopupWindow::dataUpdate_right(QVector<QVector <double> > *dataPacket)
     d_plot_right->setMatrixData(dataPacket);
 }
 
-QLine PopupWindow::convert2pixel(QLine line)
+QLine PopupWindow::convertLine2pixel(QLine line)
 {
     const QwtScaleMap xMap = d_plot_left->canvasMap( QwtPlot::xBottom );
     const QwtScaleMap yMap = d_plot_left->canvasMap( QwtPlot::yLeft );
@@ -139,6 +139,19 @@ QLine PopupWindow::convert2pixel(QLine line)
 
 }
 
+QPoint PopupWindow::convertPoint2pixel(QPoint point)
+{
+    const QwtScaleMap xMap = d_plot_left->canvasMap( QwtPlot::xBottom );
+    const QwtScaleMap yMap = d_plot_left->canvasMap( QwtPlot::yLeft );
+
+    int x1 = xMap.transform( point.x() );
+    int y1 = yMap.transform( point.y() );
+
+    QPoint point_pixels(x1, y1);
+    return point_pixels;
+
+}
+
 void PopupWindow::drawLine(QVector <QLine> lines)
 {
     QVector<QLine> lines_left_pix;
@@ -146,16 +159,35 @@ void PopupWindow::drawLine(QVector <QLine> lines)
 
     for(int i =0; i<lines.size()/2; i++)
     {
-        lines_left_pix.append(convert2pixel(lines.at(i)));
+        lines_left_pix.append(convertLine2pixel(lines.at(i)));
     }
 
     for(int i =lines.size()/2; i<lines.size(); i++)
     {
-        lines_right_pix.append(convert2pixel(lines.at(i)));
+        lines_right_pix.append(convertLine2pixel(lines.at(i)));
     }
 
     d_plot_left->drawLine(lines_left_pix);
     d_plot_right->drawLine(lines_right_pix);
+}
+
+void PopupWindow::drawPoint(QVector <QPoint> points)
+{
+    QVector<QPoint> points_left_pix;
+    QVector<QPoint> points_right_pix;
+
+    for(int i =0; i<points.size()/2; i++)
+    {
+        points_left_pix.append(convertPoint2pixel(points.at(i)));
+    }
+
+    for(int i =points.size()/2; i<points.size(); i++)
+    {
+        points_right_pix.append(convertPoint2pixel(points.at(i)));
+    }
+
+    d_plot_left->drawPoint(points_left_pix);
+    d_plot_right->drawPoint(points_right_pix);
 }
 
 int PopupWindow::getNoiseMargin(void)

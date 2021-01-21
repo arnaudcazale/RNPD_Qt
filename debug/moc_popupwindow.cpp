@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_PopupWindow_t {
-    QByteArrayData data[8];
-    char stringdata0[108];
+    QByteArrayData data[10];
+    char stringdata0[134];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,12 +39,15 @@ QT_MOC_LITERAL(3, 29, 26), // "QVector<QVector<double> >*"
 QT_MOC_LITERAL(4, 56, 10), // "dataPacket"
 QT_MOC_LITERAL(5, 67, 16), // "dataUpdate_right"
 QT_MOC_LITERAL(6, 84, 8), // "drawLine"
-QT_MOC_LITERAL(7, 93, 14) // "QVector<QLine>"
+QT_MOC_LITERAL(7, 93, 14), // "QVector<QLine>"
+QT_MOC_LITERAL(8, 108, 9), // "drawPoint"
+QT_MOC_LITERAL(9, 118, 15) // "QVector<QPoint>"
 
     },
     "PopupWindow\0dataUpdate_left\0\0"
     "QVector<QVector<double> >*\0dataPacket\0"
-    "dataUpdate_right\0drawLine\0QVector<QLine>"
+    "dataUpdate_right\0drawLine\0QVector<QLine>\0"
+    "drawPoint\0QVector<QPoint>"
 };
 #undef QT_MOC_LITERAL
 
@@ -54,7 +57,7 @@ static const uint qt_meta_data_PopupWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       4,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -62,14 +65,16 @@ static const uint qt_meta_data_PopupWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   29,    2, 0x0a /* Public */,
-       5,    1,   32,    2, 0x0a /* Public */,
-       6,    1,   35,    2, 0x0a /* Public */,
+       1,    1,   34,    2, 0x0a /* Public */,
+       5,    1,   37,    2, 0x0a /* Public */,
+       6,    1,   40,    2, 0x0a /* Public */,
+       8,    1,   43,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
     QMetaType::Void, 0x80000000 | 3,    4,
     QMetaType::Void, 0x80000000 | 7,    2,
+    QMetaType::Void, 0x80000000 | 9,    2,
 
        0        // eod
 };
@@ -83,6 +88,7 @@ void PopupWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 0: _t->dataUpdate_left((*reinterpret_cast< QVector<QVector<double> >*(*)>(_a[1]))); break;
         case 1: _t->dataUpdate_right((*reinterpret_cast< QVector<QVector<double> >*(*)>(_a[1]))); break;
         case 2: _t->drawLine((*reinterpret_cast< QVector<QLine>(*)>(_a[1]))); break;
+        case 3: _t->drawPoint((*reinterpret_cast< QVector<QPoint>(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -93,6 +99,13 @@ void PopupWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
                 *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QVector<QLine> >(); break;
+            }
+            break;
+        case 3:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QVector<QPoint> >(); break;
             }
             break;
         }
@@ -128,13 +141,13 @@ int PopupWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 4;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 4;
     }
     return _id;
 }

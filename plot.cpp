@@ -20,34 +20,54 @@ public:
     Overlay() : QwtPlotZoneItem()
     {
        QLine line(0,0,0,0);
+       QPoint point(0,0);
        for(int i=0; i<1; i++)
        {
            m_lines.append(line);
+           m_points.append(point);
        }
     }
 
-    void set_coordonnees(QVector <QLine>);
+    void setCoordonneesLines(QVector <QLine>);
+    void setCoordonneesPoints(QVector <QPoint>);
 
     void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect) const
     {
         for(int i=0; i<m_lines.size(); i++)
         {
-            painter->setPen(QPen(Qt::black, 8, Qt::DashDotLine, Qt::RoundCap));
+            painter->setPen(QPen(Qt::black, 6, Qt::SolidLine, Qt::RoundCap));
             painter->drawLine(m_lines.at(i).x1(), m_lines.at(i).y1(), m_lines.at(i).x2(), m_lines.at(i).y2());
+            QwtPlotZoneItem::draw(painter,xMap,yMap,canvasRect);
+        }
+
+        for(int i=0; i<m_points.size(); i++)
+        {
+            painter->setPen(QPen(Qt::black, 16, Qt::SolidLine, Qt::RoundCap));
+            painter->drawPoint(m_points.at(i).x(), m_points.at(i).y());
             QwtPlotZoneItem::draw(painter,xMap,yMap,canvasRect);
         }
     }
 
 private:
     QVector <QLine> m_lines;
+    QVector <QPoint> m_points;
 };
 
-void Overlay::set_coordonnees(QVector <QLine> lines)
+void Overlay::setCoordonneesLines(QVector <QLine> lines)
 {
     //qDebug() << lines;
     for(int i=0; i<lines.size(); i++)
     {
         m_lines.replace(i, lines.at(i) );
+    }
+}
+
+void Overlay::setCoordonneesPoints(QVector <QPoint> points)
+{
+    //qDebug() << lines;
+    for(int i=0; i<points.size(); i++)
+    {
+        m_points.replace(i, points.at(i) );
     }
 }
 
@@ -525,9 +545,13 @@ void Plot::setResampleMode( int mode )
 
 void Plot::drawLine(QVector <QLine> lines)
 {
-    d_overlay->set_coordonnees(lines);
+    d_overlay->setCoordonneesLines(lines);
 }
 
+void Plot::drawPoint(QVector <QPoint> points)
+{
+    d_overlay->setCoordonneesPoints(points);
+}
 
 void Plot::updateNoiseMargin(int noiseMargin)
 {

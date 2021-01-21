@@ -104,6 +104,7 @@ signals:
     void dataReady_right(QVector <QVector <double> > *);
     void dataReady_line(QVector <QLine> );
     void dataReadyGravity_line(QVector <QLine> );
+    void dataReadyGravity_point(QVector <QPoint> );
     void dataReadyGravity_left(QVector<QVector <double> > *);
     void dataReadyGravity_right(QVector <QVector <double> > *);
 
@@ -172,6 +173,7 @@ private:
     QString dataDisplay_gravity;
     QVector <QLine> m_lines;
     QVector <QLine> m_linesGravity;
+    QVector <QPoint> m_pointsGravity;
     QVector <double> m_pointure;
 
 
