@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Plot_t {
-    QByteArrayData data[19];
-    char stringdata0[207];
+    QByteArrayData data[22];
+    char stringdata0[240];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -49,16 +49,20 @@ QT_MOC_LITERAL(13, 135, 11), // "cancelNoise"
 QT_MOC_LITERAL(14, 147, 8), // "drawLine"
 QT_MOC_LITERAL(15, 156, 14), // "QVector<QLine>"
 QT_MOC_LITERAL(16, 171, 5), // "lines"
-QT_MOC_LITERAL(17, 177, 17), // "updateNoiseMargin"
-QT_MOC_LITERAL(18, 195, 11) // "noiseMargin"
+QT_MOC_LITERAL(17, 177, 9), // "drawPoint"
+QT_MOC_LITERAL(18, 187, 15), // "QVector<QPoint>"
+QT_MOC_LITERAL(19, 203, 6), // "points"
+QT_MOC_LITERAL(20, 210, 17), // "updateNoiseMargin"
+QT_MOC_LITERAL(21, 228, 11) // "noiseMargin"
 
     },
     "Plot\0changeAlgo\0\0on\0showSpectrogram\0"
     "setColorMap\0setAlpha\0setMatrixData\0"
     "QVector<QVector<double> >*\0setResampleMode\0"
     "mode\0updateScale\0max\0cancelNoise\0"
-    "drawLine\0QVector<QLine>\0lines\0"
-    "updateNoiseMargin\0noiseMargin"
+    "drawLine\0QVector<QLine>\0lines\0drawPoint\0"
+    "QVector<QPoint>\0points\0updateNoiseMargin\0"
+    "noiseMargin"
 };
 #undef QT_MOC_LITERAL
 
@@ -68,7 +72,7 @@ static const uint qt_meta_data_Plot[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -76,16 +80,17 @@ static const uint qt_meta_data_Plot[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   64,    2, 0x0a /* Public */,
-       4,    1,   67,    2, 0x0a /* Public */,
-       5,    1,   70,    2, 0x0a /* Public */,
-       6,    1,   73,    2, 0x0a /* Public */,
-       7,    1,   76,    2, 0x0a /* Public */,
-       9,    1,   79,    2, 0x0a /* Public */,
-      11,    1,   82,    2, 0x0a /* Public */,
-      13,    1,   85,    2, 0x0a /* Public */,
-      14,    1,   88,    2, 0x0a /* Public */,
-      17,    1,   91,    2, 0x0a /* Public */,
+       1,    1,   69,    2, 0x0a /* Public */,
+       4,    1,   72,    2, 0x0a /* Public */,
+       5,    1,   75,    2, 0x0a /* Public */,
+       6,    1,   78,    2, 0x0a /* Public */,
+       7,    1,   81,    2, 0x0a /* Public */,
+       9,    1,   84,    2, 0x0a /* Public */,
+      11,    1,   87,    2, 0x0a /* Public */,
+      13,    1,   90,    2, 0x0a /* Public */,
+      14,    1,   93,    2, 0x0a /* Public */,
+      17,    1,   96,    2, 0x0a /* Public */,
+      20,    1,   99,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void, QMetaType::Bool,    3,
@@ -97,7 +102,8 @@ static const uint qt_meta_data_Plot[] = {
     QMetaType::Void, QMetaType::Int,   12,
     QMetaType::Void, QMetaType::Bool,    3,
     QMetaType::Void, 0x80000000 | 15,   16,
-    QMetaType::Void, QMetaType::Int,   18,
+    QMetaType::Void, 0x80000000 | 18,   19,
+    QMetaType::Void, QMetaType::Int,   21,
 
        0        // eod
 };
@@ -117,7 +123,8 @@ void Plot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
         case 6: _t->updateScale((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 7: _t->cancelNoise((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 8: _t->drawLine((*reinterpret_cast< QVector<QLine>(*)>(_a[1]))); break;
-        case 9: _t->updateNoiseMargin((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 9: _t->drawPoint((*reinterpret_cast< QVector<QPoint>(*)>(_a[1]))); break;
+        case 10: _t->updateNoiseMargin((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -128,6 +135,13 @@ void Plot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
                 *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QVector<QLine> >(); break;
+            }
+            break;
+        case 9:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QVector<QPoint> >(); break;
             }
             break;
         }
@@ -163,13 +177,13 @@ int Plot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 11;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }

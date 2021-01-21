@@ -288,10 +288,14 @@ void MainWindow::computeGravity(){
     qDebug() << "dev_total" << dev;
     dataDisplay_gravity.append("deviation moyenne = " + QString::number(dev) + "\n");
 
-    if( dev < -2)
+    if( dev < -3)
         dataDisplay_gravity.append("SUPINAL\n");
-    else if( dev > 0)
+    else if( dev > 3)
         dataDisplay_gravity.append("CONTROL\n");
+    else if( (dev >=-3) && (dev <=-1.5) )
+        dataDisplay_gravity.append("NEUTRE TENDANCE SUPINAL\n");
+    else if( (dev >=1.5) && (dev <=3) )
+        dataDisplay_gravity.append("NEUTRE TENDANCE CONTROL\n");
     else
         dataDisplay_gravity.append("NEUTRE\n");
 
