@@ -280,7 +280,7 @@ void MainWindow::computeGravity(){
 
     double devLeft = calc_pronation_left(&m_data_filter_left);
     double devRight = calc_pronation_right(&m_data_filter_right);
-    double dev = ((double)devLeft + (double)devRight) /2;
+    double dev = (double)(devLeft + devRight) /2.0;
 
     emit(dataReadyGravity_line(m_linesGravity));
     emit(dataReadyGravity_point(m_pointsGravity));
