@@ -281,6 +281,10 @@ void MainWindow::computeGravity(){
     double devLeft = calc_pronation_left(&m_data_filter_left);
     double devRight = calc_pronation_right(&m_data_filter_right);
     double dev = (double)(devLeft + devRight) /2.0;
+    if( (dev > 16) || (dev < -16))
+    {
+        dataDisplay_gravity.append("position problem\n");
+    }
 
     emit(dataReadyGravity_line(m_linesGravity));
     emit(dataReadyGravity_point(m_pointsGravity));
@@ -1272,8 +1276,19 @@ int MainWindow::calc_gravity(){
     filterMatrix(&m_data_right, &m_data_bin_right, &m_data_filter_right);
 
     point_t Aleft, Bleft, Aright, Bright;
-    gvtGet(&m_data_filter_left, &Aleft, &Bleft);
-    gvtGet(&m_data_filter_right, &Aright, &Bright);
+    int err_code;
+    err_code = gvtGet(&m_data_filter_left, &Aleft, &Bleft);
+    if(!err_code){
+        qDebug() << "ERROR gvtGet(left)";
+        dataDisplay_gravity.append("ERROR POSITION\n");
+        return 0;
+    }
+    err_code = gvtGet(&m_data_filter_right, &Aright, &Bright);
+    if(!err_code){
+        qDebug() << "ERROR gvtGet(right)";
+        dataDisplay_gravity.append("ERROR POSITION\n");
+        return 0;
+    }
     qDebug() << "Aleft line = " << Aleft.line << "Aleft col = " << Aleft.col;
     qDebug() << "Bleft line = " << Bleft.line << "Bleft col = " << Bleft.col;
     qDebug() << "Aright line = " << Aright.line << "Aright col = " << Aright.col;
@@ -1369,7 +1384,8 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
     }
     else if( index <= 1)
     {
-        //Problem of positionnement
+        qDebug() << "LEFT FOOT POSITIONEMENT PROBLEM";
+        return 99;
     }
 
     // Zone Highest
@@ -1418,12 +1434,13 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
     {
         /* sort and take biggest one */
         qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
-        qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        //qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
         index = 1;
     }
     else if( !index)
     {
         qDebug() << "LEFT FOOT POSITIONEMENT PROBLEM";
+        return 99;
     }
 
     qDebug() << "TOPZONE LEFT is lines [" << zx[1].start_line << "," << zx[1].end_line << "] and columns [" << zy[0].start_col << "," << zy[0].end_col << "]" ;
@@ -1631,7 +1648,8 @@ double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filt
     }
     else if( index <= 1)
     {
-        //Problem of positionnement
+        qDebug() << "LEFT FOOT POSITIONEMENT PROBLEM";
+        return 99;
     }
 
     // Zone Highest
@@ -1680,12 +1698,13 @@ double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filt
     {
         /* sort and take biggest one */
         qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
-        qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        //qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
         index = 1;
     }
     else if( !index)
     {
         qDebug() << "RIGHT FOOT POSITION PROBLEM";
+        return 99;
     }
 
     qDebug() << "TOPZONE RIGHT is lines [" << zx[1].start_line << "," << zx[1].end_line << "] and columns [" << zy[0].start_col << "," << zy[0].end_col << "]" ;
@@ -1858,7 +1877,7 @@ void MainWindow::filterMatrix(QVector <QVector <double> > *matrix, QVector <QVec
 
 }
 
-void MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, point_t *B)
+int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, point_t *B)
 {
     line_zone_t   zx[10];
     column_zone_t zy[10];
@@ -1918,7 +1937,8 @@ void MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, 
     }
     else if( index <= 1)
     {
-        //Problem of positionnement
+        qDebug() << "FOOT POSITIONEMENT PROBLEM";
+        return 0;
     }
 
     //qDebug()<< "zone X heel = " << zx[0].start_line << "to " << zx[0].end_line;
@@ -2044,6 +2064,7 @@ void MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, 
 
     //qDebug() << "B line " << B->line << "B col " << B->col;
 
+    return 1;
 }
 
 void MainWindow::get_hilo_pos(QVector <QVector <double> > *matrix, int *hi, int *low)

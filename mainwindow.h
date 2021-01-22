@@ -140,7 +140,7 @@ private:
     void get_extr_axial_left(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb);
     void get_extr_axial_right(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb);
     void filterMatrix(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin, QVector <QVector <double> > *matrix_filtered);
-    void gvtGet(QVector <QVector <double> > *matrix_filtered, point_t *A, point_t *B);
+    int gvtGet(QVector <QVector <double> > *matrix_filtered, point_t *A, point_t *B);
     static int compare_n_lines(const void *a, const void *b);
     static int compare_index(const void *a, const void *b);
     static int compare_n_cols( const void *a, const void *b);
