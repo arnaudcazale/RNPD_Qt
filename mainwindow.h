@@ -130,8 +130,8 @@ private:
     unsigned int calc_mean(QVector <QVector <double> > *matrix);
     double calc_size(void);
     int calc_gravity(void);
-    int calc_pronation_left(QVector <QVector <double> > *matrix_filter);
-    int calc_pronation_right(QVector <QVector <double> > *matrix_filter);
+    double calc_pronation_left(QVector <QVector <double> > *matrix_filter);
+    double calc_pronation_right(QVector <QVector <double> > *matrix_filter);
     void get_hilo_pos(QVector <QVector <double> > *matrix, int *hi, int *low);
     void get_coor_extr_left_for_left_foot(QVector <QVector <double> > *matrix_bin, unsigned int *xa, unsigned int *ya, unsigned int *xb, unsigned int *yb);
     void get_coor_extr_right_for_left_foot(QVector <QVector <double> > *matrix_bin, unsigned int *xc, unsigned int *yc, unsigned int *xd, unsigned int *yd);

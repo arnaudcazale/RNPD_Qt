@@ -278,8 +278,8 @@ void MainWindow::computeGravity(){
     int grav = calc_gravity();
     dataDisplay_gravity.append("GRAVITY = " + QString::number(grav) + "\n");
 
-    int devLeft = calc_pronation_left(&m_data_filter_left);
-    int devRight = calc_pronation_right(&m_data_filter_right);
+    double devLeft = calc_pronation_left(&m_data_filter_left);
+    double devRight = calc_pronation_right(&m_data_filter_right);
     double dev = ((double)devLeft + (double)devRight) /2;
 
     emit(dataReadyGravity_line(m_linesGravity));
@@ -1310,7 +1310,7 @@ int MainWindow::calc_gravity(){
     return igravity;
 }
 
-int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
+double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
 
     line_zone_t   zx[10];
     column_zone_t zy[10];
@@ -1418,12 +1418,12 @@ int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
     {
         /* sort and take biggest one */
         qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
-        //qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
         index = 1;
     }
     else if( !index)
     {
-        //Problem of positionnement
+        qDebug() << "LEFT FOOT POSITIONEMENT PROBLEM";
     }
 
     qDebug() << "TOPZONE LEFT is lines [" << zx[1].start_line << "," << zx[1].end_line << "] and columns [" << zy[0].start_col << "," << zy[0].end_col << "]" ;
@@ -1456,7 +1456,7 @@ int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
     QVector <int> sumCol;
     int sum = 0;
 
-    binarizeFromNoiseMargin(&m_data_left, &m_data_bin_left);
+    binarizeFromNoiseMargin(&m_data_filter_left, &m_data_bin_left);
 
     //Make sum of each lines
     for(int i = 0; i<LGN_NBR; i++)
@@ -1563,9 +1563,6 @@ int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
     qDebug() << "y = " << a <<"x +"<<b;
 
     double tcol = ((double)bi - b) / a;
-    tcol = ceil(tcol);
-    //tcol -= 2.;
-    //double tcol = (double)bi * a + b;
     qDebug() << "tcol" << tcol;
 
     double dev = bj - tcol;
@@ -1575,7 +1572,7 @@ int MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filter){
 
 }
 
-int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter){
+double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter){
 
     line_zone_t   zx[10];
     column_zone_t zy[10];
@@ -1683,12 +1680,12 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
     {
         /* sort and take biggest one */
         qsort( (void *)zy, index, sizeof(column_zone_t), compare_n_cols);
-        //qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
+        qsort( (void *)zy, index, sizeof(column_zone_t), compare_index);
         index = 1;
     }
     else if( !index)
     {
-        //Problem of positionnement
+        qDebug() << "RIGHT FOOT POSITION PROBLEM";
     }
 
     qDebug() << "TOPZONE RIGHT is lines [" << zx[1].start_line << "," << zx[1].end_line << "] and columns [" << zy[0].start_col << "," << zy[0].end_col << "]" ;
@@ -1721,7 +1718,7 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
     QVector <int> sumCol;
     int sum = 0;
 
-    binarizeFromNoiseMargin(&m_data_right, &m_data_bin_right);
+    binarizeFromNoiseMargin(&m_data_filter_right, &m_data_bin_right);
 
     //Make sum of each lines
     for(int i = 0; i<LGN_NBR; i++)
@@ -1830,7 +1827,6 @@ int MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter)
 
     qDebug() << "bi = " << bi;
     double tcol = ((double)bi - b) / a;
-    tcol = ceil(tcol);
 
     qDebug() << "tcol = " << tcol;
 
