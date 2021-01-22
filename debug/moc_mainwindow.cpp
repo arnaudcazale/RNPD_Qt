@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[16];
-    char stringdata0[208];
+    QByteArrayData data[21];
+    char stringdata0[314];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,23 +39,31 @@ QT_MOC_LITERAL(3, 27, 26), // "QVector<QVector<double> >*"
 QT_MOC_LITERAL(4, 54, 15), // "dataReady_right"
 QT_MOC_LITERAL(5, 70, 14), // "dataReady_line"
 QT_MOC_LITERAL(6, 85, 14), // "QVector<QLine>"
-QT_MOC_LITERAL(7, 100, 14), // "openSerialPort"
-QT_MOC_LITERAL(8, 115, 15), // "closeSerialPort"
-QT_MOC_LITERAL(9, 131, 5), // "about"
-QT_MOC_LITERAL(10, 137, 9), // "writeData"
-QT_MOC_LITERAL(11, 147, 4), // "data"
-QT_MOC_LITERAL(12, 152, 8), // "readData"
-QT_MOC_LITERAL(13, 161, 11), // "handleError"
-QT_MOC_LITERAL(14, 173, 28), // "QSerialPort::SerialPortError"
-QT_MOC_LITERAL(15, 202, 5) // "error"
+QT_MOC_LITERAL(7, 100, 21), // "dataReadyGravity_line"
+QT_MOC_LITERAL(8, 122, 22), // "dataReadyGravity_point"
+QT_MOC_LITERAL(9, 145, 15), // "QVector<QPoint>"
+QT_MOC_LITERAL(10, 161, 21), // "dataReadyGravity_left"
+QT_MOC_LITERAL(11, 183, 22), // "dataReadyGravity_right"
+QT_MOC_LITERAL(12, 206, 14), // "openSerialPort"
+QT_MOC_LITERAL(13, 221, 15), // "closeSerialPort"
+QT_MOC_LITERAL(14, 237, 5), // "about"
+QT_MOC_LITERAL(15, 243, 9), // "writeData"
+QT_MOC_LITERAL(16, 253, 4), // "data"
+QT_MOC_LITERAL(17, 258, 8), // "readData"
+QT_MOC_LITERAL(18, 267, 11), // "handleError"
+QT_MOC_LITERAL(19, 279, 28), // "QSerialPort::SerialPortError"
+QT_MOC_LITERAL(20, 308, 5) // "error"
 
     },
     "MainWindow\0dataReady_left\0\0"
     "QVector<QVector<double> >*\0dataReady_right\0"
     "dataReady_line\0QVector<QLine>\0"
-    "openSerialPort\0closeSerialPort\0about\0"
-    "writeData\0data\0readData\0handleError\0"
-    "QSerialPort::SerialPortError\0error"
+    "dataReadyGravity_line\0dataReadyGravity_point\0"
+    "QVector<QPoint>\0dataReadyGravity_left\0"
+    "dataReadyGravity_right\0openSerialPort\0"
+    "closeSerialPort\0about\0writeData\0data\0"
+    "readData\0handleError\0QSerialPort::SerialPortError\0"
+    "error"
 };
 #undef QT_MOC_LITERAL
 
@@ -65,38 +73,46 @@ static const uint qt_meta_data_MainWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      13,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       3,       // signalCount
+       7,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   59,    2, 0x06 /* Public */,
-       4,    1,   62,    2, 0x06 /* Public */,
-       5,    1,   65,    2, 0x06 /* Public */,
+       1,    1,   79,    2, 0x06 /* Public */,
+       4,    1,   82,    2, 0x06 /* Public */,
+       5,    1,   85,    2, 0x06 /* Public */,
+       7,    1,   88,    2, 0x06 /* Public */,
+       8,    1,   91,    2, 0x06 /* Public */,
+      10,    1,   94,    2, 0x06 /* Public */,
+      11,    1,   97,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    0,   68,    2, 0x08 /* Private */,
-       8,    0,   69,    2, 0x08 /* Private */,
-       9,    0,   70,    2, 0x08 /* Private */,
-      10,    1,   71,    2, 0x08 /* Private */,
-      12,    0,   74,    2, 0x08 /* Private */,
-      13,    1,   75,    2, 0x08 /* Private */,
+      12,    0,  100,    2, 0x08 /* Private */,
+      13,    0,  101,    2, 0x08 /* Private */,
+      14,    0,  102,    2, 0x08 /* Private */,
+      15,    1,  103,    2, 0x08 /* Private */,
+      17,    0,  106,    2, 0x08 /* Private */,
+      18,    1,  107,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    2,
     QMetaType::Void, 0x80000000 | 3,    2,
     QMetaType::Void, 0x80000000 | 6,    2,
+    QMetaType::Void, 0x80000000 | 6,    2,
+    QMetaType::Void, 0x80000000 | 9,    2,
+    QMetaType::Void, 0x80000000 | 3,    2,
+    QMetaType::Void, 0x80000000 | 3,    2,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QByteArray,   11,
+    QMetaType::Void, QMetaType::QByteArray,   16,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 14,   15,
+    QMetaType::Void, 0x80000000 | 19,   20,
 
        0        // eod
 };
@@ -110,12 +126,16 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->dataReady_left((*reinterpret_cast< QVector<QVector<double> >*(*)>(_a[1]))); break;
         case 1: _t->dataReady_right((*reinterpret_cast< QVector<QVector<double> >*(*)>(_a[1]))); break;
         case 2: _t->dataReady_line((*reinterpret_cast< QVector<QLine>(*)>(_a[1]))); break;
-        case 3: _t->openSerialPort(); break;
-        case 4: _t->closeSerialPort(); break;
-        case 5: _t->about(); break;
-        case 6: _t->writeData((*reinterpret_cast< const QByteArray(*)>(_a[1]))); break;
-        case 7: _t->readData(); break;
-        case 8: _t->handleError((*reinterpret_cast< QSerialPort::SerialPortError(*)>(_a[1]))); break;
+        case 3: _t->dataReadyGravity_line((*reinterpret_cast< QVector<QLine>(*)>(_a[1]))); break;
+        case 4: _t->dataReadyGravity_point((*reinterpret_cast< QVector<QPoint>(*)>(_a[1]))); break;
+        case 5: _t->dataReadyGravity_left((*reinterpret_cast< QVector<QVector<double> >*(*)>(_a[1]))); break;
+        case 6: _t->dataReadyGravity_right((*reinterpret_cast< QVector<QVector<double> >*(*)>(_a[1]))); break;
+        case 7: _t->openSerialPort(); break;
+        case 8: _t->closeSerialPort(); break;
+        case 9: _t->about(); break;
+        case 10: _t->writeData((*reinterpret_cast< const QByteArray(*)>(_a[1]))); break;
+        case 11: _t->readData(); break;
+        case 12: _t->handleError((*reinterpret_cast< QSerialPort::SerialPortError(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -126,6 +146,20 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
                 *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QVector<QLine> >(); break;
+            }
+            break;
+        case 3:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QVector<QLine> >(); break;
+            }
+            break;
+        case 4:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QVector<QPoint> >(); break;
             }
             break;
         }
@@ -149,6 +183,34 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             using _t = void (MainWindow::*)(QVector<QLine> );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MainWindow::dataReady_line)) {
                 *result = 2;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)(QVector<QLine> );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MainWindow::dataReadyGravity_line)) {
+                *result = 3;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)(QVector<QPoint> );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MainWindow::dataReadyGravity_point)) {
+                *result = 4;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)(QVector<QVector<double> > * );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MainWindow::dataReadyGravity_left)) {
+                *result = 5;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)(QVector<QVector<double> > * );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MainWindow::dataReadyGravity_right)) {
+                *result = 6;
                 return;
             }
         }
@@ -184,13 +246,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 13;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 13;
     }
     return _id;
 }
@@ -214,6 +276,34 @@ void MainWindow::dataReady_line(QVector<QLine> _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
+}
+
+// SIGNAL 3
+void MainWindow::dataReadyGravity_line(QVector<QLine> _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 3, _a);
+}
+
+// SIGNAL 4
+void MainWindow::dataReadyGravity_point(QVector<QPoint> _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 4, _a);
+}
+
+// SIGNAL 5
+void MainWindow::dataReadyGravity_left(QVector<QVector<double> > * _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 5, _a);
+}
+
+// SIGNAL 6
+void MainWindow::dataReadyGravity_right(QVector<QVector<double> > * _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 6, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

@@ -20,33 +20,54 @@ public:
     Overlay() : QwtPlotZoneItem()
     {
        QLine line(0,0,0,0);
-       for(int i=0; i<2; i++)
+       QPoint point(0,0);
+       for(int i=0; i<1; i++)
        {
            m_lines.append(line);
+           m_points.append(point);
        }
     }
 
-    void set_coordonnees(QVector <QLine>);
+    void setCoordonneesLines(QVector <QLine>);
+    void setCoordonneesPoints(QVector <QPoint>);
 
     void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect) const
     {
-        for(int i=0; i<2; i++)
+        for(int i=0; i<m_lines.size(); i++)
         {
-            painter->setPen(QPen(Qt::black, 8, Qt::DashDotLine, Qt::RoundCap));
+            painter->setPen(QPen(Qt::black, 6, Qt::SolidLine, Qt::RoundCap));
             painter->drawLine(m_lines.at(i).x1(), m_lines.at(i).y1(), m_lines.at(i).x2(), m_lines.at(i).y2());
+            QwtPlotZoneItem::draw(painter,xMap,yMap,canvasRect);
+        }
+
+        for(int i=0; i<m_points.size(); i++)
+        {
+            painter->setPen(QPen(Qt::black, 16, Qt::SolidLine, Qt::RoundCap));
+            painter->drawPoint(m_points.at(i).x(), m_points.at(i).y());
             QwtPlotZoneItem::draw(painter,xMap,yMap,canvasRect);
         }
     }
 
 private:
     QVector <QLine> m_lines;
+    QVector <QPoint> m_points;
 };
 
-void Overlay::set_coordonnees(QVector <QLine> lines)
+void Overlay::setCoordonneesLines(QVector <QLine> lines)
 {
-    for(int i=0; i<2; i++)
+    //qDebug() << lines;
+    for(int i=0; i<lines.size(); i++)
     {
         m_lines.replace(i, lines.at(i) );
+    }
+}
+
+void Overlay::setCoordonneesPoints(QVector <QPoint> points)
+{
+    //qDebug() << lines;
+    for(int i=0; i<points.size(); i++)
+    {
+        m_points.replace(i, points.at(i) );
     }
 }
 
@@ -97,7 +118,7 @@ public:
     {
         setInterval( Qt::XAxis, QwtInterval( 0, COL_NBR) );
         setInterval( Qt::YAxis, QwtInterval( 0, LGN_NBR) );
-        setInterval( Qt::ZAxis, QwtInterval( 0.0, 1000 ) );
+        setInterval( Qt::ZAxis, QwtInterval( 0.0, 1000) );
 
         QVector <double> matrix;
 
@@ -109,6 +130,11 @@ public:
             }
         }
         setValueMatrix( matrix, COL_NBR );
+    }
+
+    void changeZScale(int max)
+    {
+        setInterval( Qt::ZAxis, QwtInterval( 0.0, max) );
     }
 
 private:
@@ -405,7 +431,7 @@ void Plot::printPlot()
 void Plot::setMatrixData(QVector < QVector<double> > *dataMatrix)
 {
     //int max = *std::max_element(dataMatrix->constBegin(), dataMatrix->constEnd());
-    qDebug()<<"plot.Cpp" <<d_noise_margin;
+    //qDebug()<<"plot.Cpp" <<d_noise_margin;
     m_matrix_data->clear();
     m_matrix_data_noise->clear();
 
@@ -455,41 +481,44 @@ void Plot::cancelNoise(bool on)
     d_noise_cancel = on;
     m_matrix_data_noise->clear();
 
-    if(d_noise_cancel)
-    {
-        QVector<double> foo(0);
-        QVector<double> foo_noise(0);
+    if((m_matrix_data->size()!=0)){
 
-        for(int i = 0; i <LGN_NBR; i++)
+        if(d_noise_cancel )
         {
-            for(int j = 0; j < COL_NBR; j++)
+            QVector<double> foo(0);
+            QVector<double> foo_noise(0);
+
+            for(int i = 0; i <LGN_NBR; i++)
             {
-                foo.append(m_matrix_data->at(i).at(j));
-                foo_noise.append(m_matrix_data->at(i).at(j));
-
-                if(foo.at(j) < d_noise_margin)
+                for(int j = 0; j < COL_NBR; j++)
                 {
-                    foo_noise.replace(j, 0);
+                    foo.append(m_matrix_data->at(i).at(j));
+                    foo_noise.append(m_matrix_data->at(i).at(j));
+
+                    if(foo.at(j) < d_noise_margin)
+                    {
+                        foo_noise.replace(j, 0);
+                    }
+
                 }
+                m_matrix_data_noise->append(foo_noise);
 
+                foo.clear();
+                foo_noise.clear();
             }
-            m_matrix_data_noise->append(foo_noise);
 
-            foo.clear();
-            foo_noise.clear();
+            SpectrogramData *matrix = new SpectrogramData(m_matrix_data_noise);
+            d_spectrogram->setData( matrix );
+        }else
+        {
+            SpectrogramData *matrix = new SpectrogramData(m_matrix_data);
+            d_spectrogram->setData( matrix );
         }
 
-        SpectrogramData *matrix = new SpectrogramData(m_matrix_data_noise);
-        d_spectrogram->setData( matrix );
-    }else
-    {
-        SpectrogramData *matrix = new SpectrogramData(m_matrix_data);
-        d_spectrogram->setData( matrix );
+        setResampleMode(d_mode);
+        //updateScale(max);
+        replot();
     }
-
-    setResampleMode(d_mode);
-    //updateScale(max);
-    replot();
 
 }
 
@@ -516,20 +545,25 @@ void Plot::setResampleMode( int mode )
 
 void Plot::drawLine(QVector <QLine> lines)
 {
-    d_overlay->set_coordonnees(lines);
+    d_overlay->setCoordonneesLines(lines);
 }
 
+void Plot::drawPoint(QVector <QPoint> points)
+{
+    d_overlay->setCoordonneesPoints(points);
+}
 
 void Plot::updateNoiseMargin(int noiseMargin)
 {
     d_noise_margin = noiseMargin;
-    qDebug() << d_noise_margin;
+    //qDebug() << d_noise_margin;
 }
 
 int Plot::getNoiseMargin(void)
 {
     return d_noise_margin;
 }
+
 
 
 

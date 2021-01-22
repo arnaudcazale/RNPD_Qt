@@ -1212,7 +1212,10 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qlabel.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/QMessageBox \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qmessagebox.h \
-		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtCore/QtDebug
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtCore/QtDebug \
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/QDesktopWidget \
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/QStyle \
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qstyle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\mainwindow.o mainwindow.cpp
 
 release/plot.o: plot.cpp C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtPrintSupport/qprinter.h \
@@ -1533,7 +1536,8 @@ release/popupwindow.o: popupwindow.cpp popupwindow.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qrubberband.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtCore/qabstractitemmodel.h \
 		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qcheckbox.h \
-		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qspinbox.h
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtWidgets/qspinbox.h \
+		C:/Qt/Qt5.12.9/5.12.9/mingw73_64/include/QtCore/QtDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\popupwindow.o popupwindow.cpp
 
 release/settingsdialog.o: settingsdialog.cpp settingsdialog.h \

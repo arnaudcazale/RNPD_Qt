@@ -30,6 +30,7 @@ public Q_SLOTS:
     void updateScale(int max);
     void cancelNoise( bool on );
     void drawLine(QVector <QLine> lines);
+    void drawPoint(QVector <QPoint> points);
     void updateNoiseMargin(int noiseMargin);
 
 public:

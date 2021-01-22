@@ -26,12 +26,14 @@ public:
 
 
 protected:
-    QLine convert2pixel(QLine line);
+    QLine convertLine2pixel(QLine line);
+    QPoint convertPoint2pixel(QPoint point);
 
 public slots:
     void dataUpdate_left(QVector<QVector <double> > *dataPacket);
     void dataUpdate_right(QVector<QVector <double> > *dataPacket);
     void drawLine(QVector <QLine>);
+    void drawPoint(QVector <QPoint>);
 
 private:
     Plot *d_plot_left;
