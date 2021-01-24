@@ -1345,6 +1345,7 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
         }
         linSum->append(sum);
     }
+    qDebug() << *linSum;
 
     // mean of lines sum
     moy = 0;
@@ -1353,7 +1354,7 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
         moy += linSum->at(i);
     }
     moy /= LGN_NBR;
-    //qDebug() << moy;
+    qDebug() << moy;
 
     //find zones
     for( int i = 0; i < LGN_NBR; i++)
@@ -1609,6 +1610,7 @@ double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filt
         }
         linSum->append(sum);
     }
+    qDebug() << *linSum;
 
     // mean of lines sum
     moy = 0;
@@ -1617,7 +1619,7 @@ double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filt
         moy += linSum->at(i);
     }
     moy /= LGN_NBR;
-    //qDebug() << moy;
+    qDebug() << moy;
 
     //find zones
     for( int i = 0; i < LGN_NBR; i++)
@@ -1897,7 +1899,7 @@ int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, p
         }
         linSum->append(sum);
     }
-    //qDebug() << *linSum;
+    qDebug() << *linSum;
 
     // mean of lines sum
     moy = 0;
@@ -1906,7 +1908,7 @@ int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, p
         moy += linSum->at(i);
     }
     moy /= LGN_NBR;
-    //qDebug() << moy;
+    qDebug() << moy;
 
     //find zones
     for( int i = 0; i < LGN_NBR; i++)
@@ -1921,7 +1923,7 @@ int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, p
         {
             zx[index].end_line = i;
             zx[index].n_lines = zx[index].end_line - zx[index].start_line;
-            //qDebug() << "zone X " << index << "start from " << zx[index].start_line << "to line " << zx[index].end_line;
+            qDebug() << "zone X " << index << "start from " << zx[index].start_line << "to line " << zx[index].end_line;
             index ++;
         }
         val = linSum->at(i);
