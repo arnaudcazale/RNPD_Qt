@@ -1359,13 +1359,13 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
     //find zones
     for( int i = 0; i < LGN_NBR; i++)
     {
-        if( (linSum->at(i) > moy) && (val < moy))
+        if( (linSum->at(i) >= moy) && (val <= moy))
         {
             zx[index].index = index;
             zx[index].start_line = i;
         }
 
-        else if( ( (linSum->at(i) < moy) || (i==LGN_NBR-1)) && (val > moy))
+        else if( ( (linSum->at(i) <= moy) || (i==LGN_NBR-1)) && (val >= moy))
         {
             zx[index].end_line = i;
             zx[index].n_lines = zx[index].end_line - zx[index].start_line;
@@ -1415,12 +1415,12 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
     memset( (void *)zy, 0, sizeof(zy));
     for( int i = 0; i < COL_NBR; i++)
     {
-        if( (colSum->at(i) > moy) && (val < moy))
+        if( (colSum->at(i) >= moy) && (val <= moy))
         {
             zy[index].index = index;
             zy[index].start_col = i;
         }
-        else if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        else if( ((colSum->at(i) <= moy)||(i == COL_NBR-1)) && (val >= moy))
         {
             zy[index].end_col = i;
             zy[index].n_col = zy[index].end_col - zy[index].start_col;
@@ -1624,13 +1624,13 @@ double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filt
     //find zones
     for( int i = 0; i < LGN_NBR; i++)
     {
-        if( (linSum->at(i) > moy) && (val < moy))
+        if( (linSum->at(i) >= moy) && (val <= moy))
         {
             zx[index].index = index;
             zx[index].start_line = i;
         }
 
-        else if( ( (linSum->at(i) < moy) || (i==LGN_NBR-1)) && (val > moy))
+        else if( ( (linSum->at(i) <= moy) || (i==LGN_NBR-1)) && (val >= moy))
         {
             zx[index].end_line = i;
             zx[index].n_lines = zx[index].end_line - zx[index].start_line;
@@ -1680,12 +1680,12 @@ double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filt
     memset( (void *)zy, 0, sizeof(zy));
     for( int i = 0; i < COL_NBR; i++)
     {
-        if( (colSum->at(i) > moy) && (val < moy))
+        if( (colSum->at(i) >= moy) && (val <= moy))
         {
             zy[index].index = index;
             zy[index].start_col = i;
         }
-        else if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        else if( ((colSum->at(i) <= moy)||(i == COL_NBR-1)) && (val >= moy))
         {
             zy[index].end_col = i;
             zy[index].n_col = zy[index].end_col - zy[index].start_col;
@@ -1973,12 +1973,12 @@ int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, p
     memset( (void *)zy, 0, sizeof(zy));
     for( int i = 0; i < COL_NBR; i++)
     {
-        if( (colSum->at(i) > moy) && (val < moy))
+        if( (colSum->at(i) >= moy) && (val <= moy))
         {
             zy[index].index = index;
             zy[index].start_col = i;
         }
-        else if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        else if( ((colSum->at(i) <= moy)||(i == COL_NBR-1)) && (val >= moy))
         {
             zy[index].end_col = i;
             zy[index].n_col = zy[index].end_col - zy[index].start_col;
@@ -2033,12 +2033,12 @@ int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, p
     memset( (void *)zy, 0, sizeof(zy));
     for( int i = 0; i < COL_NBR; i++)
     {
-        if( (colSum->at(i) > moy) && (val < moy))
+        if( (colSum->at(i) >= moy) && (val <= moy))
         {
             zy[index].index = index;
             zy[index].start_col = i;
         }
-        else if( ((colSum->at(i) < moy)||(i == COL_NBR-1)) && (val > moy))
+        else if( ((colSum->at(i) <= moy)||(i == COL_NBR-1)) && (val >= moy))
         {
             zy[index].end_col = i;
             zy[index].n_col = zy[index].end_col - zy[index].start_col;
