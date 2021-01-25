@@ -1883,11 +1883,11 @@ int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, p
 {
     line_zone_t   zx[10];
     column_zone_t zy[10];
-    QVector <double> *linSum = new QVector <double> ();
-    QVector <double> *colSum = new QVector <double> ();
-    int moy = 0;
-    int val = 0;
-    int index = 0;
+    QVector <unsigned long> *linSum = new QVector <unsigned long> ();
+    QVector <unsigned long> *colSum = new QVector <unsigned long> ();
+    unsigned long moy = 0;
+    unsigned long val = 0;
+    unsigned long index = 0;
 
     // make sum tab for each lines*/
     for( int i = 0; i < LGN_NBR; i++)
@@ -1913,13 +1913,13 @@ int MainWindow::gvtGet(QVector <QVector <double> > *matrix_filter, point_t *A, p
     //find zones
     for( int i = 0; i < LGN_NBR; i++)
     {
-        if( (linSum->at(i) > moy) && (val < moy))
+        if( (linSum->at(i) >= moy) && (val <= moy))
         {
             zx[index].index = index;
             zx[index].start_line = i;
         }
 
-        if( ( (linSum->at(i) < moy) || (i==LGN_NBR-1)) && (val > moy))
+        if( ( (linSum->at(i) <= moy) || (i==LGN_NBR-1)) && (val >= moy))
         {
             zx[index].end_line = i;
             zx[index].n_lines = zx[index].end_line - zx[index].start_line;
