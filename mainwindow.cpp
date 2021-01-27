@@ -1597,7 +1597,7 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
 
     qDebug() << "tcol = " << tcol;
     dev = bj - tcol;
-    qDebug() << "dev right" << dev;
+    qDebug() << "dev left" << dev;
 
     return dev;
 }
@@ -2117,7 +2117,7 @@ void MainWindow::get_hilo_pos(QVector <QVector <double> > *matrix, int *hi, int 
 
     found = false;
     /* find hi position */
-    for( int i = LGN_NBR-1; i > 0; i--)
+    for( int i = LGN_NBR-1; i >= 0; i--)
     {
         for( int j = 0; j < COL_NBR; j++)
         {
