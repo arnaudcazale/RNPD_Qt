@@ -1576,18 +1576,30 @@ double MainWindow::calc_pronation_left(QVector <QVector <double> > *matrix_filte
     QLine line(pA.col, pA.line, pB.col, pB.line);
     m_linesGravity.append(line);
 
-    double a = ( (double)pA.line - (double)pB.line ) / ( (double)pA.col - (double)pB.col )  ;
-    double b = (double)pA.line - (a * (double)pA.col);
-    qDebug() << "y = " << a <<"x +"<<b;
+    double a = 0;
+    double b = 0;
+    double tcol = 0;
+    double dev = 0;
 
-    double tcol = ((double)bi - b) / a;
-    qDebug() << "tcol" << tcol;
+    if(pA.col == pB.col)
+    {
+        qDebug() << "droite verticale";
+        tcol = pA.col;
+    }else
+    {
+        qDebug() << "fonction affine";
+        a = ( (double)pA.line - (double)pB.line ) / ( (double)pA.col - (double)pB.col )  ;
+        b = (double)pA.line - (a * (double)pA.col);
+        qDebug() << "y = " << a <<"x +"<<b;
+        qDebug() << "bi = " << bi;
+        tcol = ((double)bi - b) / a;
+    }
 
-    double dev = bj - tcol;
-    qDebug() << "dev left" << dev;
+    qDebug() << "tcol = " << tcol;
+    dev = bj - tcol;
+    qDebug() << "dev right" << dev;
 
     return dev;
-
 }
 
 double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filter){
@@ -1840,22 +1852,32 @@ double MainWindow::calc_pronation_right(QVector <QVector <double> > *matrix_filt
 
     QLine line(pA.col, pA.line, pB.col, pB.line);
     m_linesGravity.append(line);
-
     qDebug() <<"pA.col"<<pA.col<< "pA.line " << pA.line<<"pB.col"<<pB.col<<"pB.line " << pB.line;
-    double a = ( (double)pA.line - (double)pB.line ) / ( (double)pA.col - (double)pB.col )  ;
-    double b = (double)pA.line - (a * (double)pA.col);
-    qDebug() << "y = " << a <<"x +"<<b;
 
-    qDebug() << "bi = " << bi;
-    double tcol = ((double)bi - b) / a;
+    double a = 0;
+    double b = 0;
+    double tcol = 0;
+    double dev = 0;
+
+    if(pA.col == pB.col)
+    {
+        qDebug() << "droite verticale";
+        tcol = pA.col;
+    }else
+    {
+        qDebug() << "fonction affine";
+        a = ( (double)pA.line - (double)pB.line ) / ( (double)pA.col - (double)pB.col )  ;
+        b = (double)pA.line - (a * (double)pA.col);
+        qDebug() << "y = " << a <<"x +"<<b;
+        qDebug() << "bi = " << bi;
+        tcol = ((double)bi - b) / a;
+    }
 
     qDebug() << "tcol = " << tcol;
-
-    double dev = tcol - bj;
+    dev = tcol - bj;
     qDebug() << "dev right" << dev;
 
     return dev;
-
 }
 
 void MainWindow::filterMatrix(QVector <QVector <double> > *matrix, QVector <QVector <double> > *matrix_bin, QVector <QVector <double> > *matrix_filter)
